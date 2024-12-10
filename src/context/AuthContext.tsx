@@ -25,7 +25,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [request, response, promptAsync] = Google.useAuthRequest({
     androidClientId: "YOUR_ANDROID_CLIENT_ID",
     iosClientId: "YOUR_IOS_CLIENT_ID",
-    clientId: "YOUR_EXPO_CLIENT_ID",
+    clientId:
+      "1094652425174-u5a1qb83iiemkuq4qvfmjsb06jhddag9.apps.googleusercontent.com",
   });
 
   useEffect(() => {
