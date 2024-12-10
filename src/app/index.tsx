@@ -1,15 +1,39 @@
-import { Text, View } from "react-native";
+import { View } from "react-native";
+import { makeStyles, Text, Button, useThemeMode } from "@rneui/themed";
 
 export default function Index() {
+  const styles = useStyles();
+  const { setMode, mode } = useThemeMode();
+
+  const handleOnPress = () => {
+    setMode(mode === "dark" ? "light" : "dark");
+  };
+
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>Edit app/index.tsx to edit this screen.</Text>
+    <View style={styles.container}>
+      <Text h3>Start Using RNE </Text>
+      <Text style={styles.text}>
+        Open up App.tsx to start working on your app!
+      </Text>
+      <Button onPress={handleOnPress} buttonStyle={styles.themeToggle}>
+        Switch Theme
+      </Button>
     </View>
   );
 }
+
+const useStyles = makeStyles((theme) => ({
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  text: {
+    marginVertical: theme.spacing.lg,
+  },
+  themeToggle: {
+    marginVertical: theme.spacing.md,
+    borderRadius: 100,
+  },
+}));
