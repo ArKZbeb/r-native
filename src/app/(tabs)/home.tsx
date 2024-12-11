@@ -25,7 +25,6 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
-
   container: {
     backgroundColor: "rgb(20 0 102)",
     paddingVertical: 30,
@@ -37,6 +36,6 @@ const styles = StyleSheet.create({
   welcome: {
     fontSize: 20,
     marginBottom: 20,
-    color:'whitesmoke'
+    color: "whitesmoke",
   },
 });

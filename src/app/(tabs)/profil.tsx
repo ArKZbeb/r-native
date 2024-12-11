@@ -4,12 +4,11 @@ import { router } from "expo-router";
 import { SafeAreaView, Text, StyleSheet } from "react-native";
 
 export default function Profil() {
+  const handleLogout = async () => {
+    await saveCurrentUser(null as any);
+    router.replace("/login");
+  };
 
-    const handleLogout = async () => {
-        await saveCurrentUser(null as any);
-        router.replace("/login");
-      };
-      
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Profil</Text>
@@ -22,18 +21,16 @@ export default function Profil() {
   );
 }
 
-
 const styles = StyleSheet.create({
-    container: {
-      backgroundColor: "rgb(20 0 102)",
-      flex: 1,
-      justifyContent: 'space-between',
-    },
+  container: {
+    backgroundColor: "rgb(20 0 102)",
+    flex: 1,
+    justifyContent: "space-between",
+  },
 
-    title:{
-        color: 'whitesmoke',
-        fontSize: 24,
-        textAlign: 'center'
-    }
-
-})    
+  title: {
+    color: "whitesmoke",
+    fontSize: 24,
+    textAlign: "center",
+  },
+});

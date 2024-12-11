@@ -71,14 +71,14 @@ export default function List() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.inputView}>
-      <TextInput
-        style={styles.input}
-        onChangeText={handleChangeText}
-        placeholder="categorie"
-        placeholderTextColor="gray"
-      />
+        <TextInput
+          style={styles.input}
+          onChangeText={handleChangeText}
+          placeholder="categorie"
+          placeholderTextColor="gray"
+        />
       </View>
-      
+
       <FlatList
         data={itemsFiltered}
         style={styles.list}
@@ -109,9 +109,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  inputView:{
-    backgroundColor: '#0F0032',
-    paddingVertical: 8
+  inputView: {
+    backgroundColor: "#0F0032",
+    paddingVertical: 8,
   },
 
   input: {
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     marginHorizontal: "auto",
     paddingLeft: 10,
     color: "black",
-    backgroundColor: 'whitesmoke',
+    backgroundColor: "whitesmoke",
     borderRadius: 10,
   },
 

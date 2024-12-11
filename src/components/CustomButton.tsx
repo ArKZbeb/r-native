@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginVertical: 30,
-    marginHorizontal: 'auto'
+    marginHorizontal: "auto",
   },
   buttonText: {
     color: "white",
