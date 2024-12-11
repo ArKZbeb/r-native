@@ -10,14 +10,21 @@ import {
 import { router } from "expo-router";
 import { getQuestionsList } from "../utils/apiQuestions";
 import { Question, Category, Difficulty } from "../models/question";
+import { CustomButton } from "@/components/CustomButton";
+import { saveCurrentUser } from "../utils/storage";
 
 export default function List() {
-  const [items, setItems] = useState<Question[]>([]);  // Liste complète
-  const [itemsFiltered, setItemsFiltered] = useState<Question[]>([]);  // Liste filtrée
+  const [items, setItems] = useState<Question[]>([]);
+  const [itemsFiltered, setItemsFiltered] = useState<Question[]>([]);
 
   const handlePress = (item: Question) => {
     const encodedData = encodeURIComponent(JSON.stringify(item));
     router.push(`/questionDetail?data=${encodedData}`);
+  };
+
+  const handleLogout = async () => {
+    await saveCurrentUser(null as any);
+    router.replace("/login");
   };
 
   const getDifficultyStars = (difficulty: string): string => {
@@ -43,7 +50,7 @@ export default function List() {
         )
         .sort((a, b) => a.category.localeCompare(b.category));
 
-      setItemsFiltered(filteredItems); 
+      setItemsFiltered(filteredItems);
     }
   };
 
@@ -54,7 +61,7 @@ export default function List() {
         Category.any,
         Difficulty.any
       );
-      setItems(questions); 
+      setItems(questions);
       setItemsFiltered(questions);
     };
 
@@ -87,6 +94,11 @@ export default function List() {
             <Text style={styles.question}>{item.question}</Text>
           </TouchableOpacity>
         )}
+      />
+      <CustomButton
+        title="Se déconnecter"
+        onPress={handleLogout}
+        variant="secondary"
       />
     </View>
   );

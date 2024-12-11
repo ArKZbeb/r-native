@@ -22,7 +22,7 @@ export default function Login() {
 
     if (user) {
       await saveCurrentUser(user);
-      router.replace("/home");
+      router.replace("/list");
     } else {
       Alert.alert("Erreur", "Email ou mot de passe incorrect");
     }

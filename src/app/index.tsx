@@ -10,16 +10,11 @@ export default function Index() {
 
   const checkAuth = async () => {
     const user = await getCurrentUser();
-    router.replace("/list");
-    /*
-    
     if (user) {
-      router.replace("/home");
+      router.replace("/list");
     } else {
       router.replace("/login");
     }
-
-    */
   };
 
   return (
@@ -35,4 +30,4 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-}); 
+});
