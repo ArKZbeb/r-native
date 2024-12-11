@@ -1,16 +1,16 @@
 import { TouchableOpacity, Text, StyleSheet } from "react-native";
 
-interface CustomButtonProps {
+type CustomButtonProps = {
   title: string;
   onPress: () => void;
   variant?: "primary" | "secondary";
-}
+};
 
-export const CustomButton: React.FC<CustomButtonProps> = ({
+export function CustomButton({
   title,
   onPress,
   variant = "primary",
-}) => {
+}: CustomButtonProps) {
   return (
     <TouchableOpacity
       style={[styles.button, variant === "secondary" && styles.secondaryButton]}
@@ -26,7 +26,7 @@ export const CustomButton: React.FC<CustomButtonProps> = ({
       </Text>
     </TouchableOpacity>
   );
-};
+}
 
 const styles = StyleSheet.create({
   button: {

@@ -1,16 +1,15 @@
-import React from "react";
 import { TextInput, TextInputProps, StyleSheet } from "react-native";
 
-interface CustomInputProps extends TextInputProps {
+type CustomInputProps = TextInputProps & {
   value: string;
   onChangeText: (text: string) => void;
-}
+};
 
-export const CustomInput: React.FC<CustomInputProps> = ({
+export function CustomInput({
   value,
   onChangeText,
   ...props
-}) => {
+}: CustomInputProps) {
   return (
     <TextInput
       style={styles.input}
@@ -19,7 +18,7 @@ export const CustomInput: React.FC<CustomInputProps> = ({
       {...props}
     />
   );
-};
+}
 
 const styles = StyleSheet.create({
   input: {
