@@ -12,6 +12,7 @@ import { getQuestionsList } from "@/utils/apiQuestions";
 import { Question, Category, Difficulty } from "@/models/question";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { scheduleNotification } from "@/utils/notifications";
+import { storeData } from "@/utils/storeQuestions";
 
 export default function List() {
   useEffect(() => {
@@ -21,9 +22,10 @@ export default function List() {
   const [items, setItems] = useState<Question[]>([]); // Liste complète
   const [itemsFiltered, setItemsFiltered] = useState<Question[]>([]); // Liste filtrée
 
-  const handlePress = (item: Question) => {
-    const encodedData = encodeURIComponent(JSON.stringify(item));
-    router.push(`/questionDetail?data=${encodedData}`);
+  const handlePress = (item: Question, inGame: Boolean) => {
+    console.log(item);
+    storeData("game", item);
+    router.push(`/questionDetail?inGame=${false}`);
   };
 
   const getDifficultyStars = (difficulty: string): string => {
@@ -85,7 +87,7 @@ export default function List() {
         renderItem={({ item }) => (
           <TouchableOpacity
             style={styles.item}
-            onPress={() => handlePress(item)}
+            onPress={() => handlePress(item, false)}
           >
             <View style={styles.topItem}>
               <Text style={styles.index}>{`question ${item.id}`}</Text>

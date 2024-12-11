@@ -1,28 +1,29 @@
-import { useLocalSearchParams } from "expo-router";
+import { getData } from "@/utils/storeQuestions";
+import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function QuestionDetail() {
-  const { data } = useLocalSearchParams();
-
+  const { inGame } = useLocalSearchParams();
+  const [question, setQuestion] = useState<any | null>(null);
+  const [questions, setQuestions] = useState<any | null>(null);
   const [isAnswered, setIsAnswered] = useState(false);
   const [selectedChoice, setSelectedChoice] = useState<string | null>(null);
   const [correctChoice, setCorrectChoice] = useState<string | null>(null);
+  const [choices, setChoices] = useState<string[]>([]);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
-  const question =
-    data && typeof data === "string"
-      ? JSON.parse(decodeURIComponent(data))
+  const params =
+    inGame && typeof inGame === "string"
+      ? JSON.parse(decodeURIComponent(inGame))
       : null;
 
-  const [choices, setChoices] = useState([]);
-
   const verifyResponse = (item: string) => {
-    if (!isAnswered) {
+    if (!isAnswered && question) {
       setIsAnswered(true);
       setSelectedChoice(item);
-
-      if (item == question.correct_answer) {
+      if (item === question.correct_answer) {
         setCorrectChoice(item);
       } else {
         setCorrectChoice(question.correct_answer);
@@ -30,44 +31,97 @@ export default function QuestionDetail() {
     }
   };
 
+  const fetchQuestions = async () => {
+    try {
+      const storedQuestions = await getData("game");
+
+      if (Array.isArray(storedQuestions)) {
+        setQuestions(storedQuestions);
+        const firstQuestion = storedQuestions[0];
+        setQuestion(firstQuestion);
+        setChoices(firstQuestion.shuffledChoices);
+      } else if (storedQuestions && storedQuestions.shuffledChoices) {
+        setQuestion(storedQuestions);
+        setChoices(storedQuestions.shuffledChoices);
+      } else {
+        console.error("Format de données invalide");
+      }
+    } catch (error) {
+      console.error("Erreur de récupération des questions", error);
+    }
+  };
+
+  const nextQuestion = () => {
+    const nextIndex = currentQuestionIndex + 1;
+    if (questions && nextIndex < questions.length) {
+      setCurrentQuestionIndex(nextIndex);
+      const nextQuestion = questions[nextIndex];
+      setQuestion(nextQuestion);
+      setChoices(nextQuestion.shuffledChoices);
+      setIsAnswered(false); // Réinitialise l'état pour la prochaine question
+      setSelectedChoice(null);
+      setCorrectChoice(null);
+    } else {
+      console.log("Aucune question suivante disponible.");
+      router.replace({
+        pathname: "/",
+      });
+    }
+  };
+
   useEffect(() => {
-    setChoices(question.shuffledChoices);
+    fetchQuestions();
   }, []);
+
+  if (!question) {
+    return (
+      <SafeAreaView style={styles.bg}>
+        <Text style={styles.textResponse}>Chargement...</Text>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.bg}>
-      {question ? (
-        <>
-          <Text style={styles.question}>{question.question}</Text>
-          <View style={styles.container}>
-            {choices.map((item, index) => (
-              <TouchableOpacity
-                key={index}
-                style={[
-                  styles.item,
-                  item === correctChoice
-                    ? styles.correctChoice
-                    : selectedChoice === item
-                      ? styles.incorrectChoice
-                      : null,
-                ]}
-                onPress={() => verifyResponse(item)}
-              >
-                <Text style={styles.itemText}>{item}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-          <Text style={styles.textResponse}>
-            {isAnswered ? `la réponse était "${question.correct_answer}"` : ""}
-          </Text>
-        </>
-      ) : (
-        <Text>Aucune donnée disponible</Text>
+      {params && (
+        <Text style={styles.text}>
+          Question {currentQuestionIndex + 1}/{questions.length}
+        </Text>
+      )}
+      <Text style={styles.question}>{question.question}</Text>
+      <View style={styles.container}>
+        {choices.map((item, index) => (
+          <TouchableOpacity
+            key={index}
+            style={[
+              styles.item,
+              item === correctChoice
+                ? styles.correctChoice
+                : selectedChoice === item
+                  ? styles.incorrectChoice
+                  : null,
+            ]}
+            onPress={() => verifyResponse(item)}
+          >
+            <Text style={styles.itemText}>{item}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+      <Text style={styles.textResponse}>
+        {isAnswered ? `la réponse était "${question.correct_answer}"` : ""}
+      </Text>
+
+      {params && isAnswered && (
+        <TouchableOpacity
+          onPress={() => nextQuestion()}
+          style={styles.startGameBtn}
+        >
+          <Text style={styles.startGameBtnText}>Suivant</Text>
+        </TouchableOpacity>
       )}
     </SafeAreaView>
   );
 }
-
 const styles = StyleSheet.create({
   bg: {
     flex: 1,
@@ -87,6 +141,12 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     gap: 20,
     paddingHorizontal: 20,
+  },
+
+  text: {
+    textAlign: "center",
+    color: "white",
+    fontSize: 24,
   },
 
   item: {
@@ -113,5 +173,19 @@ const styles = StyleSheet.create({
     color: "white",
     textAlign: "center",
     fontSize: 24,
+  },
+  startGameBtn: {
+    borderColor: "green",
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 30,
+    marginHorizontal: "auto",
+  },
+
+  startGameBtnText: {
+    fontSize: 20,
+    color: "green",
+    margin: "auto",
   },
 });
