@@ -1,8 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import * as SecureStore from "expo-secure-store";
 import * as Google from "expo-auth-session/providers/google";
 import * as Crypto from "expo-crypto";
-import { AuthState, User } from "../../utils/types";
+import * as WebBrowser from "expo-web-browser";
+import { AuthState, User } from "../utils/types";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+// Ensure WebBrowser is properly redirected
+WebBrowser.maybeCompleteAuthSession();
 
 interface AuthContextType extends AuthState {
   signIn: (email: string, password: string) => Promise<void>;
@@ -21,21 +25,64 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     isLoading: true,
   });
 
-  // Configure Google Auth
-  const [request, response, promptAsync] = Google.useAuthRequest({
-    androidClientId: "YOUR_ANDROID_CLIENT_ID",
-    iosClientId: "YOUR_IOS_CLIENT_ID",
-    clientId:
-      "1094652425174-u5a1qb83iiemkuq4qvfmjsb06jhddag9.apps.googleusercontent.com",
-  });
+  const [request, response, promptAsync] = Google.useIdTokenAuthRequest(
+    {
+      clientId:
+        "1094652425174-u5a1qb83iiemkuq4qvfmjsb06jhddag9.apps.googleusercontent.com",
+    },
+    { native: "nativequiz://" }
+  );
 
   useEffect(() => {
     loadUser();
   }, []);
 
+  // Handle Google Sign In Response
+  useEffect(() => {
+    if (response?.type === "success") {
+      const { authentication } = response;
+      if (authentication?.accessToken) {
+        fetchUserInfo(authentication.accessToken);
+      }
+    } else if (response?.type === "error") {
+      console.error("Google Sign In Error:", response.error);
+    }
+  }, [response]);
+
+  const fetchUserInfo = async (accessToken: string) => {
+    try {
+      const response = await fetch(
+        "https://www.googleapis.com/userinfo/v2/me",
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch user info");
+      }
+
+      const userData = await response.json();
+
+      const user: User = {
+        id: userData.id,
+        email: userData.email,
+        name: userData.name,
+      };
+
+      await AsyncStorage.setItem("user", JSON.stringify(user));
+      setState({ user, isLoading: false });
+    } catch (error) {
+      console.error("Error fetching user info:", error);
+      throw error;
+    }
+  };
+
   const loadUser = async () => {
     try {
-      const userJson = await SecureStore.getItemAsync("user");
+      const userJson = await AsyncStorage.getItem("user");
       if (userJson) {
         setState({ user: JSON.parse(userJson), isLoading: false });
       } else {
@@ -49,9 +96,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const signIn = async (email: string, password: string) => {
     try {
-      // Dans un cas réel, vous feriez une requête à votre backend
-      // Ici, on vérifie juste si l'utilisateur existe dans le stockage local
-      const storedUserJson = await SecureStore.getItemAsync(email);
+      const storedUserJson = await AsyncStorage.getItem(email);
       if (!storedUserJson) {
         throw new Error("User not found");
       }
@@ -69,7 +114,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         name: storedUser.name,
       };
 
-      await SecureStore.setItemAsync("user", JSON.stringify(user));
+      await AsyncStorage.setItem("user", JSON.stringify(user));
       setState({ user, isLoading: false });
     } catch (error) {
       console.error("Error signing in:", error);
@@ -79,40 +124,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const signInWithGoogle = async () => {
     try {
+      if (!request) {
+        throw new Error("Google Auth request not initialized");
+      }
+
       const result = await promptAsync();
-      if (result?.type === "success") {
-        const { authentication } = result;
 
-        // Récupération des informations de l'utilisateur avec le token d'accès
-        const userInfoResponse = await fetch(
-          "https://www.googleapis.com/userinfo/v2/me",
-          {
-            headers: {
-              Authorization: `Bearer ${authentication?.accessToken}`,
-            },
-          }
-        );
+      if (result.type === "error") {
+        throw new Error(result.error?.message || "Google sign in failed");
+      }
 
-        const userData = await userInfoResponse.json();
-
-        // Création de l'utilisateur avec les vraies données Google
-        const user: User = {
-          id: userData.id, // Google User ID
-          email: userData.email,
-          name: userData.name,
-        };
-
-        // Stockage des informations utilisateur
-        await SecureStore.setItemAsync("user", JSON.stringify(user));
-        setState({ user, isLoading: false });
-
-        // Optionnel : stockage du token pour une utilisation ultérieure
-        if (authentication?.accessToken) {
-          await SecureStore.setItemAsync(
-            "googleToken",
-            authentication.accessToken
-          );
-        }
+      if (result.type !== "success") {
+        throw new Error("Google sign in was cancelled");
       }
     } catch (error) {
       console.error("Error signing in with Google:", error);
@@ -124,7 +147,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const signUp = async (email: string, password: string) => {
     try {
-      const existingUser = await SecureStore.getItemAsync(email);
+      const existingUser = await AsyncStorage.getItem(email);
       if (existingUser) {
         throw new Error("Email already in use");
       }
@@ -136,12 +159,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         password: hashedPassword,
       };
 
-      await SecureStore.setItemAsync(email, JSON.stringify(newUser));
+      await AsyncStorage.setItem(email, JSON.stringify(newUser));
       const user: User = {
         id: newUser.id,
         email: newUser.email,
       };
-      await SecureStore.setItemAsync("user", JSON.stringify(user));
+      await AsyncStorage.setItem("user", JSON.stringify(user));
       setState({ user, isLoading: false });
     } catch (error) {
       console.error("Error signing up:", error);
@@ -151,7 +174,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const signOut = async () => {
     try {
-      await SecureStore.deleteItemAsync("user");
+      await AsyncStorage.removeItem("user");
       setState({ user: null, isLoading: false });
     } catch (error) {
       console.error("Error signing out:", error);
@@ -160,7 +183,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const hashPassword = async (password: string): Promise<string> => {
-    const data = new TextEncoder().encode(password);
     const hash = await Crypto.digestStringAsync(
       Crypto.CryptoDigestAlgorithm.SHA256,
       password
