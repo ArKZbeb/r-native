@@ -92,7 +92,7 @@ export default function Register() {
       }
     }
 
-    router.back();
+    router.push("/sign-in");
   };
 
   return (

@@ -16,7 +16,7 @@ interface AuthContextType extends AuthState {
     email: string,
     password: string,
     profilePhoto: string
-  ) => Promise<Request<User>>;
+  ) => Promise<Request<void>>;
   signOut: () => Promise<Request<void>>;
 }
 
@@ -68,29 +68,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       );
 
       if (!response.ok) {
-        throw new Error("Failed to fetch user info");
+        console.error("Error fetching user info:");
       }
 
       const userData = await response.json();
+      const storedUserJson = await AsyncStorage.getItem(userData.email);
+      let expTotal = 0;
+      if (storedUserJson) {
+        const signingUser = JSON.parse(storedUserJson);
+        expTotal = signingUser.expTotal;
+      }
+      const user = new User(
+        userData.id,
+        userData.email,
+        "",
+        userData.picture,
+        expTotal
+      );
 
-      const user: User = {
-        id: userData.id,
-        email: userData.email,
-        name: userData.name,
-        profilePhoto: userData.picture,
-      };
-
-      await AsyncStorage.setItem("user", JSON.stringify(user));
+      await AsyncStorage.setItem(userData.email, JSON.stringify(user));
+      await AsyncStorage.setItem("session", JSON.stringify(user));
       setState({ user, isLoading: false });
     } catch (error) {
       console.error("Error fetching user info:", error);
-      throw error;
     }
   };
 
   const loadUser = async () => {
     try {
-      const userJson = await AsyncStorage.getItem("user");
+      const userJson = await AsyncStorage.getItem("session");
       if (userJson) {
         setState({ user: JSON.parse(userJson), isLoading: false });
       } else {
@@ -115,7 +121,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         };
       }
 
-      const storedUser = JSON.parse(storedUserJson);
+      const storedUser: User = JSON.parse(storedUserJson);
       const hashedPassword = await hashPassword(password);
 
       if (storedUser.password !== hashedPassword) {
@@ -125,17 +131,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         };
       }
 
-      const user: User = {
-        id: storedUser.id,
-        email: storedUser.email,
-        name: storedUser.name,
-        profilePhoto: storedUser.profilePhoto,
-      };
+      await AsyncStorage.setItem("session", JSON.stringify(storedUser));
+      setState({ user: storedUser, isLoading: false });
 
-      await AsyncStorage.setItem("user", JSON.stringify(user));
-      setState({ user, isLoading: false });
-
-      return { success: true, data: user };
+      return { success: true, data: storedUser };
     } catch (error) {
       console.error("Error signing in:", error);
       return {
@@ -187,7 +186,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     email: string,
     password: string,
     profilePhoto: string
-  ): Promise<Request<User>> => {
+  ): Promise<Request<void>> => {
     try {
       const existingUser = await AsyncStorage.getItem(email);
       if (existingUser) {
@@ -198,23 +197,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       const hashedPassword = await hashPassword(password);
-      const newUser = {
-        id: Crypto.randomUUID(),
+      const newUser = new User(
+        Crypto.randomUUID(),
         email,
-        password: hashedPassword,
+        hashedPassword,
         profilePhoto,
-      };
+        0
+      );
 
       await AsyncStorage.setItem(email, JSON.stringify(newUser));
-      const user: User = {
-        id: newUser.id,
-        email: newUser.email,
-        profilePhoto,
-      };
-      await AsyncStorage.setItem("user", JSON.stringify(user));
-      setState({ user, isLoading: false });
 
-      return { success: true, data: user };
+      return { success: true };
     } catch (error) {
       console.error("Error signing up:", error);
       return {
@@ -226,7 +219,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const signOut = async (): Promise<Request<void>> => {
     try {
-      await AsyncStorage.removeItem("user");
+      await AsyncStorage.removeItem("session");
       setState({ user: null, isLoading: false });
       return { success: true };
     } catch (error) {

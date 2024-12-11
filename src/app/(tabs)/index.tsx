@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, Image } from "react-native";
 import { router } from "expo-router";
-import { CustomButton } from "../components/CustomButton";
+import { CustomButton } from "@/components/CustomButton";
 import { useAuth } from "@/context/AuthContext";
 
 export default function Home() {
@@ -34,6 +34,8 @@ export default function Home() {
 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: "rgb(20 0 102)",
+    paddingVertical: 30,
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
@@ -42,6 +44,7 @@ const styles = StyleSheet.create({
   welcome: {
     fontSize: 20,
     marginBottom: 20,
+    color: "whitesmoke",
   },
   profileImage: {
     width: 100,
