@@ -1,7 +1,7 @@
 import { Text, View, StyleSheet } from "react-native";
 import { useEffect } from "react";
 import { router } from "expo-router";
-import { getCurrentUser } from "../../utils/storage";
+import { getCurrentUser } from "../utils/storage";
 
 export default function Index() {
   useEffect(() => {
@@ -10,11 +10,16 @@ export default function Index() {
 
   const checkAuth = async () => {
     const user = await getCurrentUser();
+    router.replace("/list");
+    /*
+    
     if (user) {
       router.replace("/home");
     } else {
       router.replace("/login");
     }
+
+    */
   };
 
   return (
@@ -30,4 +35,4 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-});
+}); 

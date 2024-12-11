@@ -8,9 +8,9 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 import { useState } from "react";
-import { CustomInput } from "../../components/CustomInput";
-import { CustomButton } from "../../components/CustomButton";
-import { getUsers, saveUsers } from "../../utils/storage";
+import { CustomInput } from "../components/CustomInput";
+import { CustomButton } from "../components/CustomButton";
+import { getUsers, saveUsers } from "../utils/storage";
 import * as ImagePicker from "expo-image-picker";
 
 export default function Register() {
