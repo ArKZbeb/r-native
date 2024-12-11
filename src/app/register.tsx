@@ -1,14 +1,44 @@
-import { View, StyleSheet, Alert } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Alert,
+  Image,
+  TouchableOpacity,
+  Text,
+} from "react-native";
 import { router } from "expo-router";
 import { useState } from "react";
 import { CustomInput } from "../../components/CustomInput";
 import { CustomButton } from "../../components/CustomButton";
 import { getUsers, saveUsers } from "../../utils/storage";
+import * as ImagePicker from "expo-image-picker";
 
 export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
+
+  const defaultProfilePhoto = require("../assets/images/default-profile.jpeg");
+
+  const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert("Sorry, we need camera roll permissions to make this work!");
+      return;
+    }
+
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setProfilePhoto(result.assets[0].uri);
+    }
+  };
 
   const handleRegister = async () => {
     if (!email || !password || !confirmPassword) {
@@ -17,7 +47,7 @@ export default function Register() {
     }
 
     if (password !== confirmPassword) {
-      Alert.alert("Lles mots de passe ne correspondent pas");
+      Alert.alert("Les mots de passe ne correspondent pas");
       return;
     }
 
@@ -33,6 +63,7 @@ export default function Register() {
       id: Date.now().toString(),
       email,
       password,
+      profilePhoto: profilePhoto,
     };
 
     await saveUsers([...users, newUser]);
@@ -46,6 +77,19 @@ export default function Register() {
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity
+        onPress={pickImage}
+        style={styles.profilePhotoContainer}
+      >
+        <Image
+          source={profilePhoto ? { uri: profilePhoto } : defaultProfilePhoto}
+          style={styles.profilePhoto}
+        />
+        <View style={styles.editOverlay}>
+          <Text style={styles.editText}>Modifier</Text>
+        </View>
+      </TouchableOpacity>
+
       <CustomInput
         placeholder="Email"
         value={email}
@@ -81,5 +125,28 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
+  },
+  profilePhotoContainer: {
+    marginBottom: 20,
+    position: "relative",
+  },
+  profilePhoto: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 2,
+    borderColor: "#ddd",
+  },
+  editOverlay: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    padding: 5,
+    borderRadius: 20,
+  },
+  editText: {
+    color: "white",
+    fontSize: 12,
   },
 });
