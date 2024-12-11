@@ -8,12 +8,12 @@ import {
   TextInput,
 } from "react-native";
 import { router } from "expo-router";
-import { getQuestionsList } from "../utils/apiQuestions";
-import { Question, Category, Difficulty } from "../models/question";
+import { getQuestionsList } from "@/utils/apiQuestions";
+import { Question, Category, Difficulty } from "@/models/question";
 
 export default function List() {
-  const [items, setItems] = useState<Question[]>([]);  // Liste complète
-  const [itemsFiltered, setItemsFiltered] = useState<Question[]>([]);  // Liste filtrée
+  const [items, setItems] = useState<Question[]>([]); // Liste complète
+  const [itemsFiltered, setItemsFiltered] = useState<Question[]>([]); // Liste filtrée
 
   const handlePress = (item: Question) => {
     const encodedData = encodeURIComponent(JSON.stringify(item));
@@ -43,7 +43,7 @@ export default function List() {
         )
         .sort((a, b) => a.category.localeCompare(b.category));
 
-      setItemsFiltered(filteredItems); 
+      setItemsFiltered(filteredItems);
     }
   };
 
@@ -54,7 +54,7 @@ export default function List() {
         Category.any,
         Difficulty.any
       );
-      setItems(questions); 
+      setItems(questions);
       setItemsFiltered(questions);
     };
 

@@ -1,30 +1,24 @@
-import { Text, View, StyleSheet } from "react-native";
-import { useEffect } from "react";
+import { View, Text, StyleSheet } from "react-native";
 import { router } from "expo-router";
-import { getCurrentUser } from "../utils/storage";
+import { CustomButton } from "../components/CustomButton";
+import { useAuth } from "@/context/AuthContext";
 
-export default function Index() {
-  useEffect(() => {
-    checkAuth();
-  }, []);
+export default function Home() {
+  const { user, signOut } = useAuth();
 
-  const checkAuth = async () => {
-    const user = await getCurrentUser();
-    router.replace("/list");
-    /*
-    
-    if (user) {
-      router.replace("/home");
-    } else {
-      router.replace("/login");
-    }
-
-    */
+  const handleLogout = async () => {
+    await signOut();
+    router.replace("/");
   };
 
   return (
     <View style={styles.container}>
-      <Text>Loading...</Text>
+      <Text style={styles.welcome}>Bienvenue {user?.email}!</Text>
+      <CustomButton
+        title="Se déconnecter"
+        onPress={handleLogout}
+        variant="secondary"
+      />
     </View>
   );
 }
@@ -34,5 +28,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    padding: 20,
   },
-}); 
+  welcome: {
+    fontSize: 20,
+    marginBottom: 20,
+  },
+});
