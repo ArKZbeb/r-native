@@ -1,9 +1,9 @@
 import { View, StyleSheet, Alert } from "react-native";
 import { router } from "expo-router";
 import { useState } from "react";
-import { CustomInput } from "../../components/CustomInput";
-import { CustomButton } from "../../components/CustomButton";
-import { getUsers, saveUsers } from "../../utils/storage";
+import { CustomInput } from "../components/CustomInput";
+import { CustomButton } from "../components/CustomButton";
+import { getUsers, saveUsers } from "../utils/storage";
 
 export default function Register() {
   const [email, setEmail] = useState("");

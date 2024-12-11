@@ -1,9 +1,9 @@
 import { View, Text, StyleSheet } from "react-native";
 import { useEffect, useState } from "react";
 import { router } from "expo-router";
-import { CustomButton } from "../../components/CustomButton";
-import { getCurrentUser, saveCurrentUser } from "../../utils/storage";
-import { User } from "../../types/auth.types";
+import { CustomButton } from "../components/CustomButton";
+import { getCurrentUser, saveCurrentUser } from "../utils/storage";
+import { User } from "../types/auth.types";
 
 export default function Home() {
   const [user, setUser] = useState<User | null>(null);
