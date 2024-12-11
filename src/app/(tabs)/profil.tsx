@@ -1,36 +1,55 @@
-import { CustomButton } from "@/components/CustomButton";
-import { saveCurrentUser } from "@/utils/storage";
+import { View, Text, StyleSheet, Image } from "react-native";
 import { router } from "expo-router";
-import { SafeAreaView, Text, StyleSheet } from "react-native";
+import { CustomButton } from "@/components/CustomButton";
+import { useAuth } from "@/context/AuthContext";
 
-export default function Profil() {
+export default function Home() {
+  const { user, signOut } = useAuth();
+
   const handleLogout = async () => {
-    await saveCurrentUser(null as any);
-    router.replace("/login");
+    await signOut();
+    router.replace("/");
+  };
+
+  const getImageSource = () => {
+    if (!user?.profilePhoto) {
+      return require("@/assets/images/default-profile.jpeg");
+    }
+    // Handle both base64 and URI formats
+    return { uri: user.profilePhoto };
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Profil</Text>
+    <View style={styles.container}>
+      <Image source={getImageSource()} style={styles.profileImage} />
+      <Text style={styles.welcome}>Bienvenue {user?.email}!</Text>
       <CustomButton
         title="Se déconnecter"
         onPress={handleLogout}
         variant="secondary"
       />
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "rgb(20 0 102)",
+    paddingVertical: 30,
     flex: 1,
-    justifyContent: "space-between",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
   },
-
-  title: {
+  welcome: {
+    fontSize: 20,
+    marginBottom: 20,
     color: "whitesmoke",
-    fontSize: 24,
-    textAlign: "center",
+  },
+  profileImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 20,
   },
 });

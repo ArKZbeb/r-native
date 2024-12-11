@@ -10,7 +10,6 @@ import {
 import { router } from "expo-router";
 import { getQuestionsList } from "@/utils/apiQuestions";
 import { Question, Category, Difficulty } from "@/models/question";
-import { CustomButton } from "@/components/CustomButton";
 import { useAuth } from "@/context/AuthContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 

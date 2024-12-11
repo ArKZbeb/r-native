@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, Image } from "react-native";
 import { router } from "expo-router";
-import { CustomButton } from "../components/CustomButton";
+import { CustomButton } from "@/components/CustomButton";
 import { useAuth } from "@/context/AuthContext";
 
 export default function Home() {
