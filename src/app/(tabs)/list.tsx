@@ -10,23 +10,20 @@ import {
 import { router } from "expo-router";
 import { getQuestionsList } from "@/utils/apiQuestions";
 import { Question, Category, Difficulty } from "@/models/question";
-import { useAuth } from "@/context/AuthContext";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { scheduleNotification } from "@/utils/notifications";
 
 export default function List() {
+  useEffect(() => {
+    scheduleNotification();
+  }, []);
+
   const [items, setItems] = useState<Question[]>([]); // Liste complète
   const [itemsFiltered, setItemsFiltered] = useState<Question[]>([]); // Liste filtrée
-
-  const { signOut } = useAuth();
 
   const handlePress = (item: Question) => {
     const encodedData = encodeURIComponent(JSON.stringify(item));
     router.push(`/questionDetail?data=${encodedData}`);
-  };
-
-  const handleLogout = async () => {
-    await signOut();
-    router.replace("/");
   };
 
   const getDifficultyStars = (difficulty: string): string => {
