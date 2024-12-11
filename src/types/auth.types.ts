@@ -25,3 +25,8 @@ export class User {
     return ((expTotal % 20) * 100) / 20;
   }
 }
+
+export interface AuthState {
+  user: User | null;
+  isLoading: boolean;
+}
