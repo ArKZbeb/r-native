@@ -12,6 +12,7 @@ import { CustomInput } from "../components/CustomInput";
 import { CustomButton } from "../components/CustomButton";
 import { getUsers, saveUsers } from "../utils/storage";
 import * as ImagePicker from "expo-image-picker";
+import { User } from "@/types/auth.types";
 
 export default function Register() {
   const [email, setEmail] = useState("");
@@ -59,12 +60,13 @@ export default function Register() {
       return;
     }
 
-    const newUser = {
-      id: Date.now().toString(),
+    const newUser = new User(
+      Date.now().toString(),
       email,
       password,
-      profilePhoto: profilePhoto,
-    };
+      profilePhoto,
+      0
+    );
 
     await saveUsers([...users, newUser]);
     Alert.alert("Succès", "Compte créé avec succès", [

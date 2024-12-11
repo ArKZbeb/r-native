@@ -32,7 +32,6 @@ export default function QuestionDetail() {
 
   useEffect(() => {
     setChoices(question.shuffledChoices);
-    
   }, []);
 
   return (
@@ -49,8 +48,8 @@ export default function QuestionDetail() {
                   item === correctChoice
                     ? styles.correctChoice
                     : selectedChoice === item
-                    ? styles.incorrectChoice
-                    : null,
+                      ? styles.incorrectChoice
+                      : null,
                 ]}
                 onPress={() => verifyResponse(item)}
               >
@@ -59,9 +58,9 @@ export default function QuestionDetail() {
             ))}
           </View>
           <Text style={styles.textResponse}>
-            {isAnswered ? `la réponse était "${question.correct_answer}"`: ''}
+            {isAnswered ? `la réponse était "${question.correct_answer}"` : ""}
           </Text>
-          </>
+        </>
       ) : (
         <Text>Aucune donnée disponible</Text>
       )}
@@ -109,9 +108,9 @@ const styles = StyleSheet.create({
   incorrectChoice: {
     backgroundColor: "red", // La réponse incorrecte en rouge
   },
-  textResponse:{
-    color: 'white',
-    textAlign: 'center',
-    fontSize: 24
-  }
+  textResponse: {
+    color: "white",
+    textAlign: "center",
+    fontSize: 24,
+  },
 });
