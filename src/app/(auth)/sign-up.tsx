@@ -8,10 +8,11 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 import { useState } from "react";
-import { CustomInput } from "../components/CustomInput";
-import { CustomButton } from "../components/CustomButton";
-import { getUsers, saveUsers } from "../utils/storage";
+import { CustomInput } from "@/components/CustomInput";
+import { CustomButton } from "@/components/CustomButton";
 import * as ImagePicker from "expo-image-picker";
+import * as FileSystem from "expo-file-system";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Register() {
   const [email, setEmail] = useState("");
@@ -19,7 +20,9 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
 
-  const defaultProfilePhoto = require("../assets/images/default-profile.jpeg");
+  const { signUp } = useAuth();
+
+  const defaultProfilePhoto = require("@/assets/images/default-profile.jpeg");
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -33,10 +36,27 @@ export default function Register() {
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
+      base64: true,
     });
 
-    if (!result.canceled) {
-      setProfilePhoto(result.assets[0].uri);
+    if (!result.canceled && result.assets[0].base64) {
+      const base64Image = `data:image/jpeg;base64,${result.assets[0].base64}`;
+      setProfilePhoto(base64Image);
+    }
+  };
+
+  const getDefaultProfilePhotoBase64 = async () => {
+    try {
+      const asset = Image.resolveAssetSource(defaultProfilePhoto);
+      if (!asset?.uri) return null;
+
+      const base64 = await FileSystem.readAsStringAsync(asset.uri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+      return `data:image/jpeg;base64,${base64}`;
+    } catch (error) {
+      console.error("Error converting default photo to base64:", error);
+      return null;
     }
   };
 
@@ -51,28 +71,28 @@ export default function Register() {
       return;
     }
 
-    const users = await getUsers();
-    const existingUser = users.find((u) => u.email === email);
-
-    if (existingUser) {
-      Alert.alert("Cet email est déjà utilisé");
-      return;
+    let photoToUse = profilePhoto;
+    if (!photoToUse) {
+      photoToUse = await getDefaultProfilePhotoBase64();
     }
 
-    const newUser = {
-      id: Date.now().toString(),
-      email,
-      password,
-      profilePhoto: profilePhoto,
-    };
+    const signUpResult = await signUp(email, password, photoToUse || "");
 
-    await saveUsers([...users, newUser]);
-    Alert.alert("Succès", "Compte créé avec succès", [
-      {
-        text: "OK",
-        onPress: () => router.back(),
-      },
-    ]);
+    if (!signUpResult.success) {
+      switch (signUpResult.error.statusCode) {
+        case 400:
+          Alert.alert("Error", "Email déjà utilisé");
+          break;
+        case 500:
+          Alert.alert("Error", "Erreur lors de l'inscription");
+          break;
+        default:
+          Alert.alert("Error", "Erreur lors de l'inscription");
+          break;
+      }
+    }
+
+    router.back();
   };
 
   return (

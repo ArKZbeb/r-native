@@ -47,7 +47,7 @@ export default function Camera() {
     if (capturedPhoto) {
       try {
         await AsyncStorage.setItem("lastCapturedPhoto", capturedPhoto);
-        router.replace("/home");
+        router.replace("/");
         alert("Photo saved successfully!");
         setCapturedPhoto(null);
       } catch (error) {

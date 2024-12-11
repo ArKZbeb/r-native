@@ -59,6 +59,5 @@ const decodeHtmlEntities = (text: string): string => {
     .replace(/&amp;/g, "&")
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
-    .replace(/&Uuml;/g, "Ü")
-    
+    .replace(/&Uuml;/g, "Ü");
 };

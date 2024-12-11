@@ -8,14 +8,16 @@ import {
   TextInput,
 } from "react-native";
 import { router } from "expo-router";
-import { getQuestionsList } from "../utils/apiQuestions";
-import { Question, Category, Difficulty } from "../models/question";
+import { getQuestionsList } from "@/utils/apiQuestions";
+import { Question, Category, Difficulty } from "@/models/question";
 import { CustomButton } from "@/components/CustomButton";
-import { saveCurrentUser } from "../utils/storage";
+import { useAuth } from "@/context/AuthContext";
 
 export default function List() {
-  const [items, setItems] = useState<Question[]>([]);
-  const [itemsFiltered, setItemsFiltered] = useState<Question[]>([]);
+  const [items, setItems] = useState<Question[]>([]); // Liste complète
+  const [itemsFiltered, setItemsFiltered] = useState<Question[]>([]); // Liste filtrée
+
+  const { signOut } = useAuth();
 
   const handlePress = (item: Question) => {
     const encodedData = encodeURIComponent(JSON.stringify(item));
@@ -23,8 +25,8 @@ export default function List() {
   };
 
   const handleLogout = async () => {
-    await saveCurrentUser(null as any);
-    router.replace("/login");
+    await signOut();
+    router.replace("/");
   };
 
   const getDifficultyStars = (difficulty: string): string => {
