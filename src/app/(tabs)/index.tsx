@@ -1,33 +1,12 @@
 import { View, Text, StyleSheet, Image } from "react-native";
-import { router } from "expo-router";
-import { CustomButton } from "@/components/CustomButton";
 import { useAuth } from "@/context/AuthContext";
 
 export default function Home() {
   const { user, signOut } = useAuth();
 
-  const handleLogout = async () => {
-    await signOut();
-    router.replace("/");
-  };
-
-  const getImageSource = () => {
-    if (!user?.profilePhoto) {
-      return require("@/assets/images/default-profile.jpeg");
-    }
-    // Handle both base64 and URI formats
-    return { uri: user.profilePhoto };
-  };
-
   return (
     <View style={styles.container}>
-      <Image source={getImageSource()} style={styles.profileImage} />
       <Text style={styles.welcome}>Bienvenue {user?.email}!</Text>
-      <CustomButton
-        title="Se déconnecter"
-        onPress={handleLogout}
-        variant="secondary"
-      />
     </View>
   );
 }
