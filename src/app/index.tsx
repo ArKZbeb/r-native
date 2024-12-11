@@ -11,7 +11,7 @@ export default function Index() {
   const checkAuth = async () => {
     const user = await getCurrentUser();
     if (user) {
-      router.replace("/list");
+      router.replace("/home");
     } else {
       router.replace("/login");
     }
