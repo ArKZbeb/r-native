@@ -1,9 +1,9 @@
-import { View, Text, StyleSheet } from "react-native";
+import { Text, StyleSheet } from "react-native";
 import { useEffect, useState } from "react";
 import { router } from "expo-router";
-import { CustomButton } from "../components/CustomButton";
-import { getCurrentUser, saveCurrentUser } from "../utils/storage";
-import { User } from "../types/auth.types";
+import { getCurrentUser, saveCurrentUser } from "../../utils/storage";
+import { User } from "../../types/auth.types";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Home() {
   const [user, setUser] = useState<User | null>(null);
@@ -17,25 +17,17 @@ export default function Home() {
     setUser(currentUser);
   };
 
-  const handleLogout = async () => {
-    await saveCurrentUser(null as any);
-    router.replace("/login");
-  };
-
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Text style={styles.welcome}>Bienvenue {user?.email}!</Text>
-      <CustomButton
-        title="Se déconnecter"
-        onPress={handleLogout}
-        variant="secondary"
-      />
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: "rgb(20 0 102)",
+    paddingVertical: 30,
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
@@ -44,5 +36,6 @@ const styles = StyleSheet.create({
   welcome: {
     fontSize: 20,
     marginBottom: 20,
+    color: "whitesmoke",
   },
 });

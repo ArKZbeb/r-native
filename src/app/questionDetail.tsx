@@ -94,6 +94,7 @@ const styles = StyleSheet.create({
     height: 65,
     borderRadius: 12,
     display: "flex",
+    padding: 10,
   },
 
   itemText: {

@@ -8,10 +8,10 @@ import {
   TextInput,
 } from "react-native";
 import { router } from "expo-router";
-import { getQuestionsList } from "../utils/apiQuestions";
-import { Question, Category, Difficulty } from "../models/question";
-import { CustomButton } from "@/components/CustomButton";
-import { saveCurrentUser } from "../utils/storage";
+import { getQuestionsList } from "../../utils/apiQuestions";
+import { Question, Category, Difficulty } from "../../models/question";
+import { saveCurrentUser } from "../../utils/storage";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function List() {
   const [items, setItems] = useState<Question[]>([]);
@@ -69,12 +69,16 @@ export default function List() {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <TextInput
-        style={styles.input}
-        onChangeText={handleChangeText}
-        placeholder="categorie"
-      />
+    <SafeAreaView style={styles.container}>
+      <View style={styles.inputView}>
+        <TextInput
+          style={styles.input}
+          onChangeText={handleChangeText}
+          placeholder="categorie"
+          placeholderTextColor="gray"
+        />
+      </View>
+
       <FlatList
         data={itemsFiltered}
         style={styles.list}
@@ -95,20 +99,19 @@ export default function List() {
           </TouchableOpacity>
         )}
       />
-      <CustomButton
-        title="Se déconnecter"
-        onPress={handleLogout}
-        variant="secondary"
-      />
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "rgb(20 0 102)",
-    paddingVertical: 30,
     flex: 1,
+  },
+
+  inputView: {
+    backgroundColor: "#0F0032",
+    paddingVertical: 8,
   },
 
   input: {
@@ -116,10 +119,10 @@ const styles = StyleSheet.create({
     borderColor: "gray",
     borderWidth: 1,
     width: "90%",
-    marginBottom: 20,
     marginHorizontal: "auto",
     paddingLeft: 10,
-    color: "white",
+    color: "black",
+    backgroundColor: "whitesmoke",
     borderRadius: 10,
   },
 
@@ -133,7 +136,7 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "column",
     padding: 15,
-    backgroundColor: "white",
+    backgroundColor: "whitesmoke",
     borderRadius: 12,
   },
 
@@ -150,7 +153,7 @@ const styles = StyleSheet.create({
   },
 
   difficulty: {
-    color: "rgb(255 222 0)",
+    color: "#FFD700",
   },
 
   question: {
