@@ -12,7 +12,7 @@ export default function RootLayout() {
       }}
     >
       <Tabs.Screen
-        name="home"
+        name="index"
         options={{
           title: "Menu",
           tabBarIcon: ({ color }) => (
