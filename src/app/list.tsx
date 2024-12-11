@@ -10,14 +10,23 @@ import {
 import { router } from "expo-router";
 import { getQuestionsList } from "@/utils/apiQuestions";
 import { Question, Category, Difficulty } from "@/models/question";
+import { CustomButton } from "@/components/CustomButton";
+import { useAuth } from "@/context/AuthContext";
 
 export default function List() {
   const [items, setItems] = useState<Question[]>([]); // Liste complète
   const [itemsFiltered, setItemsFiltered] = useState<Question[]>([]); // Liste filtrée
 
+  const { signOut } = useAuth();
+
   const handlePress = (item: Question) => {
     const encodedData = encodeURIComponent(JSON.stringify(item));
     router.push(`/questionDetail?data=${encodedData}`);
+  };
+
+  const handleLogout = async () => {
+    await signOut();
+    router.replace("/");
   };
 
   const getDifficultyStars = (difficulty: string): string => {
@@ -87,6 +96,11 @@ export default function List() {
             <Text style={styles.question}>{item.question}</Text>
           </TouchableOpacity>
         )}
+      />
+      <CustomButton
+        title="Se déconnecter"
+        onPress={handleLogout}
+        variant="secondary"
       />
     </View>
   );

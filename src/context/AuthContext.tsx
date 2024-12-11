@@ -2,17 +2,22 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import * as Google from "expo-auth-session/providers/google";
 import * as Crypto from "expo-crypto";
 import * as WebBrowser from "expo-web-browser";
-import { AuthState, User } from "../utils/types";
+import { AuthState, User } from "@/types/auth.types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Request } from "@/types/request";
 
 // Ensure WebBrowser is properly redirected
 WebBrowser.maybeCompleteAuthSession();
 
 interface AuthContextType extends AuthState {
-  signIn: (email: string, password: string) => Promise<void>;
-  signInWithGoogle: () => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
-  signOut: () => Promise<void>;
+  signIn: (email: string, password: string) => Promise<Request<User>>;
+  signInWithGoogle: () => Promise<Request<void>>;
+  signUp: (
+    email: string,
+    password: string,
+    profilePhoto: string
+  ) => Promise<Request<User>>;
+  signOut: () => Promise<Request<void>>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -25,12 +30,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     isLoading: true,
   });
 
-  const [request, response, promptAsync] = Google.useIdTokenAuthRequest(
+  const [request, response, promptAsync] = Google.useAuthRequest(
     {
       clientId:
         "1094652425174-u5a1qb83iiemkuq4qvfmjsb06jhddag9.apps.googleusercontent.com",
     },
-    { native: "nativequiz://" }
+    {
+      native: "nativequiz://",
+    }
   );
 
   useEffect(() => {
@@ -70,6 +77,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         id: userData.id,
         email: userData.email,
         name: userData.name,
+        profilePhoto: userData.picture,
       };
 
       await AsyncStorage.setItem("user", JSON.stringify(user));
@@ -94,62 +102,99 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (
+    email: string,
+    password: string
+  ): Promise<Request<User>> => {
     try {
       const storedUserJson = await AsyncStorage.getItem(email);
       if (!storedUserJson) {
-        throw new Error("User not found");
+        return {
+          success: false,
+          error: { message: "Utilisateur non trouvé", statusCode: 404 },
+        };
       }
 
       const storedUser = JSON.parse(storedUserJson);
       const hashedPassword = await hashPassword(password);
 
       if (storedUser.password !== hashedPassword) {
-        throw new Error("Invalid password");
+        return {
+          success: false,
+          error: { message: "Mot de passe incorrect", statusCode: 401 },
+        };
       }
 
       const user: User = {
         id: storedUser.id,
         email: storedUser.email,
         name: storedUser.name,
+        profilePhoto: storedUser.profilePhoto,
       };
 
       await AsyncStorage.setItem("user", JSON.stringify(user));
       setState({ user, isLoading: false });
+
+      return { success: true, data: user };
     } catch (error) {
       console.error("Error signing in:", error);
-      throw error;
+      return {
+        success: false,
+        error: { message: "Erreur lors de la connexion", statusCode: 500 },
+      };
     }
   };
 
-  const signInWithGoogle = async () => {
+  const signInWithGoogle = async (): Promise<Request<void>> => {
     try {
       if (!request) {
-        throw new Error("Google Auth request not initialized");
+        return {
+          success: false,
+          error: {
+            message: "Google Auth request not initialized",
+            statusCode: 500,
+          },
+        };
       }
 
       const result = await promptAsync();
 
       if (result.type === "error") {
-        throw new Error(result.error?.message || "Google sign in failed");
+        return {
+          success: false,
+          error: { message: "Google sign in failed", statusCode: 400 },
+        };
       }
 
       if (result.type !== "success") {
-        throw new Error("Google sign in was cancelled");
+        return {
+          success: false,
+          error: { message: "Google sign in was cancelled", statusCode: 400 },
+        };
       }
+
+      return { success: true };
     } catch (error) {
       console.error("Error signing in with Google:", error);
-      throw new Error(
-        error instanceof Error ? error.message : "Failed to sign in with Google"
-      );
+      return {
+        success: false,
+        error: { message: "Erreur lors de la connexion", statusCode: 500 },
+      };
     }
   };
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (
+    email: string,
+    password: string,
+    profilePhoto: string
+  ): Promise<Request<User>> => {
     try {
       const existingUser = await AsyncStorage.getItem(email);
       if (existingUser) {
-        throw new Error("Email already in use");
+        return {
+          success: false,
+          error: { message: "Email déjà utilisé", statusCode: 400 },
+        };
       }
 
       const hashedPassword = await hashPassword(password);
@@ -157,28 +202,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         id: Crypto.randomUUID(),
         email,
         password: hashedPassword,
+        profilePhoto,
       };
 
       await AsyncStorage.setItem(email, JSON.stringify(newUser));
       const user: User = {
         id: newUser.id,
         email: newUser.email,
+        profilePhoto,
       };
       await AsyncStorage.setItem("user", JSON.stringify(user));
       setState({ user, isLoading: false });
+
+      return { success: true, data: user };
     } catch (error) {
       console.error("Error signing up:", error);
-      throw error;
+      return {
+        success: false,
+        error: { message: "Erreur lors de l'inscription", statusCode: 500 },
+      };
     }
   };
 
-  const signOut = async () => {
+  const signOut = async (): Promise<Request<void>> => {
     try {
       await AsyncStorage.removeItem("user");
       setState({ user: null, isLoading: false });
+      return { success: true };
     } catch (error) {
       console.error("Error signing out:", error);
-      throw error;
+      return {
+        success: false,
+        error: { message: "Erreur lors de la déconnexion", statusCode: 500 },
+      };
     }
   };
 
