@@ -16,6 +16,8 @@ export async function scheduleNotification() {
     return;
   }
 
+  await Notifications.cancelAllScheduledNotificationsAsync();
+
   if (Platform.OS === "android") {
     await Notifications.setNotificationChannelAsync("default", {
       name: "default",
