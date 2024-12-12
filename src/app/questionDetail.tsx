@@ -29,7 +29,6 @@ export default function QuestionDetail() {
       if (item === question.correct_answer) {
         console.log("Bonne réponse");
         user?.addExp(2 * difficultyValue(question.difficulty));
-        // save le nouveau score de l'utilisateur dans le context
         if (user) {
           await saveUser(user);
         }
