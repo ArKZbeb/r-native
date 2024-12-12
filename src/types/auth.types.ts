@@ -7,6 +7,10 @@ export class User {
     public expTotal: number
   ) {}
 
+  addExp(exp: number) {
+    this.expTotal += exp;
+  }
+
   getLevel() {
     const maxLevel = 20;
     let level = 0;
