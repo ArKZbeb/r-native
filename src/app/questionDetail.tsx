@@ -1,4 +1,4 @@
-import { useAuth } from "@/context/AuthContext";
+import { saveUser, useAuth } from "@/context/AuthContext";
 import { GameHistory } from "@/models/gameHistory";
 import { addGameToHistory } from "@/utils/gameHistory";
 import { difficultyValue } from "@/utils/dificultyValue";
@@ -40,11 +40,11 @@ export default function QuestionDetail() {
       }
     }
   };
-   const { user } = useAuth();
+  const { user } = useAuth();
 
-   if (user === null) {
-     return
-   }
+  if (user === null) {
+    return;
+  }
 
   const saveGameHistory = async () => {
     const game: GameHistory = {
@@ -216,7 +216,3 @@ const styles = StyleSheet.create({
     margin: "auto",
   },
 });
-function saveUser(user: User) {
-  throw new Error("Function not implemented.");
-}
-

@@ -24,7 +24,6 @@ export default function Home() {
       <Image source={getImageSource()} style={styles.profileImage} />
       <Text style={styles.welcome}>Bienvenue {user?.email}!</Text>
       {user && <ExperienceProgressBar expTotal={user.expTotal} />}
-      
 
       <CustomButton
         title="Se déconnecter"
