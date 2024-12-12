@@ -45,10 +45,10 @@ export default function Home() {
         renderItem={({ item, index }) => (
           <TouchableOpacity onPress={() => handleGamePress(item.id)}>
             <View style={styles.item}>
-              <Text>Partie {index + 1}</Text>
-              <Text>Date: {item.date}</Text>
-              <Text>Score: {item.score}</Text>
-              <Text>Nombre de questions: {item.questions.length}</Text>
+              <Text style={styles.itemText}>Partie {index + 1}</Text>
+              <Text style={styles.itemText}>Date: {item.date}</Text>
+              <Text style={styles.itemText}>Score: {item.score}</Text>
+              <Text style={styles.itemText}>Nombre de questions: {item.questions.length}</Text>
             </View>
           </TouchableOpacity>
         )}
@@ -70,12 +70,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     color: "whitesmoke",
   },
-  profileImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    marginBottom: 20,
-  },
   startGameBtn: {
     borderColor: "green",
     borderWidth: 1,
@@ -83,11 +77,12 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 30,
     marginHorizontal: "auto",
+    justifyContent: "center",
   },
   startGameBtnText: {
     fontSize: 20,
     color: "green",
-    margin: "auto",
+    textAlign: "center",
   },
   title: {
     fontSize: 24,
@@ -96,11 +91,15 @@ const styles = StyleSheet.create({
     color: "whitesmoke",
   },
   item: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-    backgroundColor: "whitesmoke",
+    backgroundColor: "white",
     borderRadius: 12,
-    marginVertical: 5,
+    padding: 15,
+    marginBottom: 10,
+  },
+  itemText: {
+    fontSize: 18,
+    color: "rgb(20 0 102)",
+    fontWeight: "600",
+    marginBottom: 5,
   },
 });
