@@ -11,8 +11,9 @@ export const ExperienceProgressBar: React.FC<ExperienceProgressBarProps> = ({
 }) => {
   const { user } = useAuth();
   // Vérifiez que l'utilisateur et les méthodes existent
-  const currentLevel = user?.getLevel() || 0;
-  const percentageToNextLevel = user?.getPercentageToNextLevel() || 0;
+  const currentLevel = user?.getLevel(user.expTotal) || 0;
+  const percentageToNextLevel =
+    user?.getPercentageToNextLevel(user.expTotal) || 0;
 
   return (
     <View style={styles.container}>
