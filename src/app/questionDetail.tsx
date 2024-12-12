@@ -1,10 +1,13 @@
 import { saveUser, useAuth } from "@/context/AuthContext";
+import { GameHistory } from "@/models/gameHistory";
+import { addGameToHistory } from "@/utils/gameHistory";
 import { difficultyValue } from "@/utils/dificultyValue";
 import { getData } from "@/utils/storeQuestions";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { User } from "@/types/auth.types";
 
 export default function QuestionDetail() {
   const { inGame } = useLocalSearchParams();
@@ -15,7 +18,6 @@ export default function QuestionDetail() {
   const [correctChoice, setCorrectChoice] = useState<string | null>(null);
   const [choices, setChoices] = useState<string[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const { user } = useAuth();
 
   const params =
     inGame && typeof inGame === "string"
@@ -37,6 +39,22 @@ export default function QuestionDetail() {
         setCorrectChoice(question.correct_answer);
       }
     }
+  };
+  const { user } = useAuth();
+
+  if (user === null) {
+    return;
+  }
+
+  const saveGameHistory = async () => {
+    const game: GameHistory = {
+      id: new Date().toISOString(),
+      userId: user.id,
+      date: new Date().toLocaleString(),
+      score: 2, //TODO: Calculer le score
+      questions: questions.map((q: any) => q.question),
+    };
+    await addGameToHistory(game);
   };
 
   const fetchQuestions = async () => {
@@ -70,6 +88,7 @@ export default function QuestionDetail() {
       setSelectedChoice(null);
       setCorrectChoice(null);
     } else {
+      saveGameHistory();
       console.log("Aucune question suivante disponible.");
       router.replace({
         pathname: "/",
