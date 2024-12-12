@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { useAuth } from "@/context/AuthContext";
 import { router } from "expo-router";
+import { CustomButton } from "@/components/CustomButton";
 
 export default function Home() {
   const { user, signOut } = useAuth();
@@ -26,6 +27,10 @@ export default function Home() {
       </TouchableOpacity>
       <Text style={styles.welcome}>dernières parties jouées</Text>
       <Text style={styles.welcome}>Bienvenue {user?.email}!</Text>
+      <CustomButton
+      title="Voir l'historique des parties"
+      onPress={() => router.push("/gameHistory")}
+/>
     </SafeAreaView>
   );
 }
