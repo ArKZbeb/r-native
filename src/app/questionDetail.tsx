@@ -1,3 +1,5 @@
+import { saveUser, useAuth } from "@/context/AuthContext";
+import { difficultyValue } from "@/utils/dificultyValue";
 import { getData } from "@/utils/storeQuestions";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
@@ -13,17 +15,24 @@ export default function QuestionDetail() {
   const [correctChoice, setCorrectChoice] = useState<string | null>(null);
   const [choices, setChoices] = useState<string[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const { user } = useAuth();
 
   const params =
     inGame && typeof inGame === "string"
       ? JSON.parse(decodeURIComponent(inGame))
       : null;
 
-  const verifyResponse = (item: string) => {
+  const verifyResponse = async (item: string) => {
     if (!isAnswered && question) {
       setIsAnswered(true);
       setSelectedChoice(item);
       if (item === question.correct_answer) {
+        console.log("Bonne réponse");
+        user?.addExp(2 * difficultyValue(question.difficulty));
+        // save le nouveau score de l'utilisateur dans le context
+        if (user) {
+          await saveUser(user);
+        }
         setCorrectChoice(item);
       } else {
         setCorrectChoice(question.correct_answer);
