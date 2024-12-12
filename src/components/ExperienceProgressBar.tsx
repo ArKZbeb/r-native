@@ -18,7 +18,7 @@ export const ExperienceProgressBar: React.FC<ExperienceProgressBarProps> = ({
     <View style={styles.container}>
       <View style={styles.levelContainer}>
         <Text style={styles.levelText}>Niveau {currentLevel}</Text>
-        <Text style={styles.expText}>{expTotal} XP</Text>
+        <Text style={styles.expText}>{expTotal % 20} XP</Text>
       </View>
 
       <View style={styles.progressBarBackground}>

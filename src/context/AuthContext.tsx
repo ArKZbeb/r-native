@@ -272,6 +272,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
 export const saveUser = async (user: User) => {
   await AsyncStorage.setItem(user.email, JSON.stringify(user));
+  await AsyncStorage.setItem("session", JSON.stringify(user));
 };
 
 export const useAuth = () => {
