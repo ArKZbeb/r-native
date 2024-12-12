@@ -7,22 +7,22 @@ export class User {
     public expTotal: number
   ) {}
 
-  getLevel(expTotal: number) {
+  getLevel() {
     const maxLevel = 20;
     let level = 0;
-    while (expTotal > 20 || level === maxLevel) {
+    while (this.expTotal > 20 || level === maxLevel) {
       level += 1;
-      expTotal -= 20;
+      this.expTotal -= 20;
     }
     return level;
   }
 
-  getPercentageToNextLevel(expTotal: number) {
-    const level = this.getLevel(expTotal);
+  getPercentageToNextLevel() {
+    const level = this.getLevel();
     if (level === 20) {
       return 0;
     }
-    return ((expTotal % 20) * 100) / 20;
+    return ((this.expTotal % 20) * 100) / 20;
   }
 }
 

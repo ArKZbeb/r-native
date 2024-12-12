@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, Image } from "react-native";
 import { router } from "expo-router";
 import { CustomButton } from "@/components/CustomButton";
 import { useAuth } from "@/context/AuthContext";
+import { ExperienceProgressBar } from "@/components/ExperienceProgressBar";
 
 export default function Home() {
   const { user, signOut } = useAuth();
@@ -15,7 +16,6 @@ export default function Home() {
     if (!user?.profilePhoto) {
       return require("@/assets/images/default-profile.jpeg");
     }
-    // Handle both base64 and URI formats
     return { uri: user.profilePhoto };
   };
 
@@ -23,6 +23,10 @@ export default function Home() {
     <View style={styles.container}>
       <Image source={getImageSource()} style={styles.profileImage} />
       <Text style={styles.welcome}>Bienvenue {user?.email}!</Text>
+
+      {/* Ajout du composant ExperienceProgressBar */}
+      {user && <ExperienceProgressBar expTotal={user.expTotal} />}
+
       <CustomButton
         title="Se déconnecter"
         onPress={handleLogout}
@@ -31,7 +35,6 @@ export default function Home() {
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "rgb(20 0 102)",
