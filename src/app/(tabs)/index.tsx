@@ -1,20 +1,32 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  SafeAreaView,
-} from "react-native";
+import { useEffect, useState } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, FlatList } from "react-native";
 import { useAuth } from "@/context/AuthContext";
 import { router } from "expo-router";
 import { CustomButton } from "@/components/CustomButton";
+import { getGameHistory } from "@/utils/gameHistory";
+import { GameHistory } from "@/models/gameHistory";
 
 export default function Home() {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
+  const [history, setHistory] = useState<GameHistory[]>([]);
+
+  useEffect(() => {
+    const fetchHistory = async () => {
+      if (user) {
+        const gameHistory = await getGameHistory(user.id);
+        setHistory(gameHistory);
+      }
+    };
+
+    fetchHistory();
+  }, [user]);
 
   const handlePress = () => {
     router.push("/gameConfig");
+  };
+
+  const handleGamePress = (gameId: string) => {
+    router.push(`/gameHistory?id=${gameId}`);
   };
 
   return (
@@ -25,12 +37,22 @@ export default function Home() {
       >
         <Text style={styles.startGameBtnText}>Lancer une partie</Text>
       </TouchableOpacity>
-      <Text style={styles.welcome}>dernières parties jouées</Text>
       <Text style={styles.welcome}>Bienvenue {user?.email}!</Text>
-      <CustomButton
-      title="Voir l'historique des parties"
-      onPress={() => router.push("/gameHistory")}
-/>
+      <Text style={styles.title}>Historique des parties</Text>
+      <FlatList
+        data={history}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item, index }) => (
+          <TouchableOpacity onPress={() => handleGamePress(item.id)}>
+            <View style={styles.item}>
+              <Text>Partie {index + 1}</Text>
+              <Text>Date: {item.date}</Text>
+              <Text>Score: {item.score}</Text>
+              <Text>Nombre de questions: {item.questions.length}</Text>
+            </View>
+          </TouchableOpacity>
+        )}
+      />
     </SafeAreaView>
   );
 }
@@ -54,7 +76,6 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     marginBottom: 20,
   },
-
   startGameBtn: {
     borderColor: "green",
     borderWidth: 1,
@@ -63,10 +84,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     marginHorizontal: "auto",
   },
-
   startGameBtnText: {
     fontSize: 20,
     color: "green",
     margin: "auto",
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+    color: "whitesmoke",
+  },
+  item: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+    backgroundColor: "whitesmoke",
+    borderRadius: 12,
+    marginVertical: 5,
   },
 });

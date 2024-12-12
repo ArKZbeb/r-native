@@ -1,4 +1,3 @@
-// src/utils/gameHistory.ts
 import { GameHistory } from "@/models/gameHistory";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -26,5 +25,17 @@ export const getGameHistory = async (userId: string): Promise<GameHistory[]> => 
   } catch (error) {
     console.error("Erreur lors de la récupération de l'historique des parties", error);
     return [];
+  }
+};
+
+export const getGameById = async (userId: string, gameId: string): Promise<GameHistory | null> => {
+  try {
+    const historyJson = await AsyncStorage.getItem(HISTORY_KEY);
+    const history = historyJson ? JSON.parse(historyJson) : {};
+    const userHistory = history[userId] || [];
+    return userHistory.find((game: GameHistory) => game.id === gameId) || null;
+  } catch (error) {
+    console.error("Erreur lors de la récupération de la partie", error);
+    return null;
   }
 };

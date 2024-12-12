@@ -43,17 +43,15 @@ export default function QuestionDetail() {
    const { user } = useAuth();
 
    if (user === null) {
-     router.replace({
-       pathname: "/",
-     });
+     return
    }
 
   const saveGameHistory = async () => {
     const game: GameHistory = {
       id: new Date().toISOString(),
-      userId: user?.id || "",
+      userId: user.id,
       date: new Date().toLocaleString(),
-      score: 2,
+      score: 2, //TODO: Calculer le score
       questions: questions.map((q: any) => q.question),
     };
     await addGameToHistory(game);
