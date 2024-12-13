@@ -1,4 +1,4 @@
-import { Question, Category, Difficulty } from "../models/question";
+import { Category, Difficulty, Question } from "../models/question";
 
 export const getQuestionsList = async (
   nbOfQuestion: string,
@@ -49,7 +49,7 @@ export const getQuestionsList = async (
   );
   return [];
 };
-const arrayShuffle = (a: Array<string>): Array<string> => {
+const arrayShuffle = (a: string[]): string[] => {
   let l = a.length,
     t,
     r;

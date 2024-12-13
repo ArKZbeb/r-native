@@ -7,7 +7,6 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { User } from "@/types/auth.types";
 
 export default function QuestionDetail() {
   const { inGame } = useLocalSearchParams();
@@ -18,6 +17,11 @@ export default function QuestionDetail() {
   const [correctChoice, setCorrectChoice] = useState<string | null>(null);
   const [choices, setChoices] = useState<string[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [score, setScore] = useState(0);
+
+  useEffect(() => {
+    fetchQuestions();
+  }, []);
 
   const params =
     inGame && typeof inGame === "string"
@@ -34,6 +38,7 @@ export default function QuestionDetail() {
         if (user) {
           await saveUser(user);
         }
+        setScore(score + 1);
         setCorrectChoice(item);
       } else {
         setCorrectChoice(question.correct_answer);
@@ -45,13 +50,12 @@ export default function QuestionDetail() {
   if (user === null) {
     return;
   }
-
   const saveGameHistory = async () => {
     const game: GameHistory = {
       id: new Date().toISOString(),
       userId: user.id,
       date: new Date().toLocaleString(),
-      score: 2, //TODO: Calculer le score
+      score: score,
       questions: questions.map((q: any) => q.question),
     };
     await addGameToHistory(game);
@@ -95,10 +99,6 @@ export default function QuestionDetail() {
       });
     }
   };
-
-  useEffect(() => {
-    fetchQuestions();
-  }, []);
 
   if (!question) {
     return (

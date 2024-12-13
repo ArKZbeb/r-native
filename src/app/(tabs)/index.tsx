@@ -1,8 +1,14 @@
 import { useEffect, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, FlatList } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  SafeAreaView,
+  FlatList,
+} from "react-native";
 import { useAuth } from "@/context/AuthContext";
 import { router } from "expo-router";
-import { CustomButton } from "@/components/CustomButton";
 import { getGameHistory } from "@/utils/gameHistory";
 import { GameHistory } from "@/models/gameHistory";
 
@@ -40,15 +46,19 @@ export default function Home() {
       <Text style={styles.welcome}>Bienvenue {user?.email}!</Text>
       <Text style={styles.title}>Historique des parties</Text>
       <FlatList
-        data={history}
+        data={[...history].reverse()}
         keyExtractor={(item) => item.id}
         renderItem={({ item, index }) => (
           <TouchableOpacity onPress={() => handleGamePress(item.id)}>
             <View style={styles.item}>
-              <Text style={styles.itemText}>Partie {index + 1}</Text>
+              <Text style={styles.itemText}>
+                Partie {history.length - index}
+              </Text>
               <Text style={styles.itemText}>Date: {item.date}</Text>
               <Text style={styles.itemText}>Score: {item.score}</Text>
-              <Text style={styles.itemText}>Nombre de questions: {item.questions.length}</Text>
+              <Text style={styles.itemText}>
+                Nombre de questions: {item.questions.length}
+              </Text>
             </View>
           </TouchableOpacity>
         )}
