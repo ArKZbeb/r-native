@@ -10,25 +10,33 @@ export const addGameToHistory = async (game: GameHistory) => {
     if (!history[game.userId]) {
       history[game.userId] = [];
     }
-    history[game.userId].push(game);
+    history[game.userId].unshift(game);
     await AsyncStorage.setItem(HISTORY_KEY, JSON.stringify(history));
   } catch (error) {
     console.error("Erreur lors de l'ajout de l'historique de la partie", error);
   }
 };
 
-export const getGameHistory = async (userId: string): Promise<GameHistory[]> => {
+export const getGameHistory = async (
+  userId: string
+): Promise<GameHistory[]> => {
   try {
     const historyJson = await AsyncStorage.getItem(HISTORY_KEY);
     const history = historyJson ? JSON.parse(historyJson) : {};
     return history[userId] || [];
   } catch (error) {
-    console.error("Erreur lors de la récupération de l'historique des parties", error);
+    console.error(
+      "Erreur lors de la récupération de l'historique des parties",
+      error
+    );
     return [];
   }
 };
 
-export const getGameById = async (userId: string, gameId: string): Promise<GameHistory | null> => {
+export const getGameById = async (
+  userId: string,
+  gameId: string
+): Promise<GameHistory | null> => {
   try {
     const historyJson = await AsyncStorage.getItem(HISTORY_KEY);
     const history = historyJson ? JSON.parse(historyJson) : {};

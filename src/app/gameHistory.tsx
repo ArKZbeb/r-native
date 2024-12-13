@@ -1,5 +1,12 @@
 import { useEffect, useState } from "react";
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, SafeAreaView } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+  SafeAreaView,
+} from "react-native";
 import { getGameHistory, getGameById } from "@/utils/gameHistory";
 import { GameHistory } from "@/models/gameHistory";
 import { useAuth } from "@/context/AuthContext";
@@ -24,7 +31,7 @@ export default function GameHistoryScreen() {
   }, [user]);
 
   useEffect(() => {
-    if (typeof id === 'string' && user) {
+    if (typeof id === "string" && user) {
       const fetchGame = async () => {
         const game = await getGameById(user.id, id);
         setGame(game);
@@ -47,10 +54,16 @@ export default function GameHistoryScreen() {
           <Text style={styles.itemText}>Score: {game.score}</Text>
           <Text style={styles.itemText}>Questions:</Text>
           {game.questions.map((question, index) => (
-            <Text key={index} style={styles.itemText}>{index + 1}. {question}</Text>
+            <Text key={index} style={styles.itemText}>
+              {index + 1}. {question}
+            </Text>
           ))}
         </View>
-        <CustomButton title="Retour à l'accueil" onPress={() => router.push('/')} variant="secondary" />
+        <CustomButton
+          title="Retour à l'accueil"
+          onPress={() => router.push("/")}
+          variant="secondary"
+        />
       </SafeAreaView>
     );
   }
@@ -62,18 +75,27 @@ export default function GameHistoryScreen() {
         data={history}
         keyExtractor={(item) => item.id}
         renderItem={({ item, index }) => (
-          <TouchableOpacity style={styles.touchableOpacity} onPress={() => router.push(`/gameHistory?id=${item.id}`)}>
+          <TouchableOpacity
+            style={styles.touchableOpacity}
+            onPress={() => router.push(`/gameHistory?id=${item.id}`)}
+          >
             <View style={styles.item}>
               <Text style={styles.itemText}>Partie {index + 1}</Text>
               <Text style={styles.itemText}>Date: {item.date}</Text>
               <Text style={styles.itemText}>Score: {item.score}</Text>
-              <Text style={styles.itemText}>Nombre de questions: {item.questions.length}</Text>
+              <Text style={styles.itemText}>
+                Nombre de questions: {item.questions.length}
+              </Text>
             </View>
           </TouchableOpacity>
         )}
         style={styles.flatList}
       />
-      <CustomButton title="Retour à l'accueil" onPress={() => router.push('/')} variant="secondary" />
+      <CustomButton
+        title="Retour à l'accueil"
+        onPress={() => router.push("/")}
+        variant="secondary"
+      />
     </SafeAreaView>
   );
 }
