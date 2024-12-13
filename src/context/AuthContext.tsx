@@ -35,6 +35,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       "1094652425174-u5a1qb83iiemkuq4qvfmjsb06jhddag9.apps.googleusercontent.com",
     androidClientId:
       "1094652425174-l4ffuimej211ch4dg088it8kvbmapvlu.apps.googleusercontent.com",
+    iosClientId:
+      "1094652425174-d0d1v6mqcfne3as4kiqevpuf0rk2ch5t.apps.googleusercontent.com",
   });
 
   useEffect(() => {
