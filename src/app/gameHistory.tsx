@@ -47,17 +47,12 @@ export default function GameHistoryScreen() {
 
   if (id && game) {
     return (
-      <SafeAreaView style={styles.bg}>
+      <SafeAreaView style={styles.container}>
         <Text style={styles.text}>Détails de la partie</Text>
         <View style={styles.item}>
           <Text style={styles.itemText}>Date: {game.date}</Text>
           <Text style={styles.itemText}>Score: {game.score}</Text>
           <Text style={styles.itemText}>Questions:</Text>
-          {game.questions.map((question, index) => (
-            <Text key={index} style={styles.itemText}>
-              {index + 1}. {question.question}
-            </Text>
-          ))}
         </View>
         <CustomButton
           title="Retour à l'accueil"
@@ -69,7 +64,7 @@ export default function GameHistoryScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.bg}>
+    <SafeAreaView style={styles.container}>
       <Text style={styles.text}>Historique des parties</Text>
       <FlatList
         data={history}
@@ -101,15 +96,14 @@ export default function GameHistoryScreen() {
 }
 
 const styles = StyleSheet.create({
-  bg: {
+  container: {
+    backgroundColor: "rgb(233, 236, 239)",
     flex: 1,
-    backgroundColor: "rgb(20 0 102)",
     padding: 20,
   },
 
   text: {
     textAlign: "center",
-    color: "white",
     fontSize: 24,
     marginBottom: 20,
   },
@@ -123,8 +117,6 @@ const styles = StyleSheet.create({
 
   itemText: {
     fontSize: 18,
-    color: "rgb(20 0 102)",
-    fontWeight: "600",
     marginBottom: 5,
   },
 
