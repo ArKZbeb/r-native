@@ -15,12 +15,12 @@ export type Game =
   | {
       type: GameType.SINGLE;
       questions: [Question];
-      questionSelections: [] | [string];
       currentQuestion: CurrentQuestion;
     }
   | {
       type: GameType.QUIZ;
       questions: Question[];
+      score: number;
       questionSelections: string[];
       currentQuestion: CurrentQuestion;
     };

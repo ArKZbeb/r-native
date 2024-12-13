@@ -12,12 +12,10 @@ import { router } from "expo-router";
 import { useState } from "react";
 import { saveGame } from "@/utils/game-manager";
 import { Game, GameType } from "@/types/game.types";
-import { storeData } from "@/utils/storeQuestions";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function GameConfig() {
   const [nbOfQuestion, setnbOfQuestion] = useState(3);
-  const [isLoading, setIsLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category>(
     Category.any
   );
@@ -63,6 +61,7 @@ export default function GameConfig() {
     const newGame: Game = {
       type: GameType.QUIZ,
       questions: questions,
+      score: 0,
       questionSelections: [],
       currentQuestion: {
         index: 0,

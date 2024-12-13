@@ -28,7 +28,6 @@ export default function List() {
     const newGame: Game = {
       type: GameType.SINGLE,
       questions: [item],
-      questionSelections: [],
       currentQuestion: {
         index: 0,
         isAnswered: false,

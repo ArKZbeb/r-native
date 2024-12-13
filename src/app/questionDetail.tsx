@@ -13,6 +13,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { clearGame, loadGame, saveGame } from "@/utils/game-manager";
 import { Game, GameType } from "@/types/game.types";
 import { getDifficultyStars } from "@/utils/questions";
+import { addGameToHistory } from "@/utils/gameHistory";
+import { GameHistory } from "@/models/gameHistory";
+import { useAuth } from "@/context/AuthContext";
+import { difficultyValue } from "@/utils/dificultyValue";
 
 export default function QuestionDetail() {
   const [game, setGame] = useState<Game | null>(null);
@@ -71,9 +75,37 @@ export default function QuestionDetail() {
     checkGame();
   }, []);
 
+  const { user } = useAuth();
+
+  if (!user) {
+    return;
+  }
+
+  const saveGameHistory = async () => {
+    if (game?.type === GameType.QUIZ) {
+      const gameHistory: GameHistory = {
+        id: new Date().toISOString(),
+        userId: user.id,
+        date: new Date().toLocaleString(),
+        ...game,
+      };
+      await addGameToHistory(gameHistory);
+    }
+  };
+
   const verifyResponse = async (choice: string) => {
     if (game && !game.currentQuestion.isAnswered) {
-      if (game.type === GameType.QUIZ) game.questionSelections.push(choice);
+      if (game.type === GameType.QUIZ) {
+        game.questionSelections.push(choice);
+
+        const currentQuestion = game.questions[game.currentQuestion.index];
+        const isCorrect = currentQuestion.correct_answer === choice;
+
+        if (isCorrect) {
+          game.score += 1;
+          user?.addExp(2 * difficultyValue(currentQuestion.difficulty));
+        }
+      }
 
       const updatedGame: Game = {
         ...game,
@@ -83,6 +115,7 @@ export default function QuestionDetail() {
           selectedChoice: choice,
         },
       };
+
       await saveGame(updatedGame);
       setGame(updatedGame);
     }
@@ -104,6 +137,7 @@ export default function QuestionDetail() {
       await saveGame(updatedGame);
       setGame(updatedGame);
     } else {
+      saveGameHistory();
       console.log("Aucune question suivante disponible.");
       await clearGame();
       router.replace("/");
@@ -127,9 +161,14 @@ export default function QuestionDetail() {
   return (
     <SafeAreaView style={styles.bg}>
       {game.type == GameType.QUIZ && (
-        <Text style={styles.text}>
-          Question {game.currentQuestion.index + 1}/{game.questions.length}
-        </Text>
+        <>
+          <Text style={styles.text}>
+            Question {game.currentQuestion.index + 1}/{game.questions.length}
+          </Text>
+          <Text style={styles.score}>
+            Score: {`${game.score} / ${game.questions.length}`}
+          </Text>
+        </>
       )}
       <Text style={styles.question}>{currentQuestion.question}</Text>
       <Text style={styles.category}>
@@ -190,6 +229,10 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     fontSize: 24,
     color: "white",
+  },
+  score: {
+    color: "white",
+    textAlign: "center",
   },
   difficulty: {
     color: "white",
