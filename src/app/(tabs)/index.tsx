@@ -40,21 +40,26 @@ export default function Home() {
       <View style={styles.Viewtitle}>
         <Text style={styles.title}>Historique des parties</Text>
       </View>
-      <FlatList
-        style={styles.list}
-        data={[...history].reverse()}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item, index }) => (
-          <TouchableOpacity onPress={() => handleGamePress(item.id)}>
-            <View style={styles.item}>
-              <Text style={styles.itemText}>{item.date}</Text>
-              <Text style={styles.itemText}>
-                Score: {item.score} / {item.questions.length}
-              </Text>
-            </View>
-          </TouchableOpacity>
-        )}
-      />
+      {history.length && (
+        <FlatList
+          style={styles.list}
+          data={[...history].reverse()}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item, index }) => (
+            <TouchableOpacity onPress={() => handleGamePress(item.id)}>
+              <View style={styles.item}>
+                <Text style={styles.itemText}>{item.date}</Text>
+                <Text style={styles.itemText}>
+                  Score: {item.score} / {item.questions.length}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          )}
+        />
+      )}
+      {!history.length && (
+        <Text style={styles.text}>Aucun historique disponible...</Text>
+      )}
       <TouchableOpacity
         style={styles.startGameBtn}
         onPress={() => handlePress()}
@@ -69,6 +74,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: "rgb(233, 236, 239)",
     flex: 1,
+    display: "flex",
   },
   welcome: {
     fontSize: 20,
@@ -89,6 +95,10 @@ const styles = StyleSheet.create({
   Viewtitle: {
     backgroundColor: "rgb(233, 236, 239)",
     padding: 10,
+  },
+
+  text: {
+    margin: "auto",
   },
 
   title: {

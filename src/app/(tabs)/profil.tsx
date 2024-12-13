@@ -1,7 +1,7 @@
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { router } from "expo-router";
 import { CustomButton } from "@/components/CustomButton";
-import { useAuth } from "@/context/AuthContext";
+import { deleteUser, useAuth } from "@/context/AuthContext";
 import { ExperienceProgressBar } from "@/components/ExperienceProgressBar";
 
 export default function Home() {
@@ -10,6 +10,14 @@ export default function Home() {
   const handleLogout = async () => {
     await signOut();
     router.replace("/");
+  };
+
+  const deleteAcount = async () => {
+    if (user != null) {
+      await deleteUser(user);
+      await signOut();
+      router.replace("/");
+    }
   };
 
   const getImageSource = () => {
@@ -28,11 +36,17 @@ export default function Home() {
 
       {user && <ExperienceProgressBar expTotal={user.expTotal} />}
 
-      <CustomButton
-        title="Se déconnecter"
-        onPress={handleLogout}
-        variant="secondary"
-      />
+      <View style={styles.profilBottom}>
+        <CustomButton
+          title="Se déconnecter"
+          onPress={handleLogout}
+          variant="secondary"
+        />
+
+        <TouchableOpacity onPress={deleteAcount}>
+          <Text style={styles.deleteBtn}>delete acount</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -54,5 +68,16 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     marginBottom: 20,
     marginHorizontal: "auto",
+  },
+
+  profilBottom: {
+    width: "80%",
+    display: "flex",
+  },
+
+  deleteBtn: {
+    margin: "auto",
+    color: "red",
+    fontSize: 18,
   },
 });

@@ -275,6 +275,11 @@ export const saveUser = async (user: User) => {
   await AsyncStorage.setItem("session", JSON.stringify(user));
 };
 
+export const deleteUser = async (user: User) => {
+  await AsyncStorage.removeItem(user.email);
+  await AsyncStorage.removeItem("session");
+};
+
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
