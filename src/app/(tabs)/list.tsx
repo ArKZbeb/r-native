@@ -103,16 +103,16 @@ export default function List() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "rgb(20 0 102)",
+    backgroundColor: "rgb(233, 236, 239)",
     flex: 1,
   },
   inputView: {
-    backgroundColor: "#0F0032",
+    backgroundColor: "rgb(233, 236, 239)",
     paddingVertical: 8,
   },
   input: {
     height: 40,
-    borderColor: "gray",
+    borderColor: "lightgray",
     borderWidth: 1,
     width: "90%",
     marginHorizontal: "auto",
@@ -130,8 +130,11 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "column",
     padding: 15,
-    backgroundColor: "whitesmoke",
+    backgroundColor: "rgb(248, 249, 250)",
     borderRadius: 12,
+    boxShadow: "rgba(100, 100, 111, 0.3) 0px 5px 5px 0px",
+    borderColor: "rgba(153, 153, 155, 0.3)",
+    borderWidth: 1,
   },
   topItem: {
     display: "flex",

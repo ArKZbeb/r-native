@@ -17,6 +17,7 @@ import { addGameToHistory } from "@/utils/gameHistory";
 import { GameHistory } from "@/models/gameHistory";
 import { useAuth } from "@/context/AuthContext";
 import { difficultyValue } from "@/utils/dificultyValue";
+import React from "react";
 
 export default function QuestionDetail() {
   const [game, setGame] = useState<Game | null>(null);
@@ -170,13 +171,14 @@ export default function QuestionDetail() {
           </Text>
         </>
       )}
-      <Text style={styles.question}>{currentQuestion.question}</Text>
       <Text style={styles.category}>
         {currentQuestion.category.toUpperCase()}
       </Text>
       <Text style={styles.difficulty}>
         {getDifficultyStars(currentQuestion.difficulty)}
       </Text>
+      <Text style={styles.question}>{currentQuestion.question}</Text>
+
       <View style={styles.container}>
         {currentQuestion.shuffledChoices.map((item, index) => (
           <TouchableOpacity
@@ -217,7 +219,7 @@ export default function QuestionDetail() {
 const styles = StyleSheet.create({
   bg: {
     flex: 1,
-    backgroundColor: "rgb(20 0 102)",
+    backgroundColor: "rgb(233, 236, 239)",
     justifyContent: "space-around",
   },
   centered: {
@@ -228,14 +230,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginHorizontal: 10,
     fontSize: 24,
-    color: "white",
   },
   score: {
     color: "white",
     textAlign: "center",
   },
   difficulty: {
-    color: "white",
+    color: "#FFD700",
     textAlign: "center",
   },
   category: {
@@ -256,26 +257,27 @@ const styles = StyleSheet.create({
     fontSize: 24,
   },
   item: {
-    backgroundColor: "white",
+    backgroundColor: "rgb(248, 249, 250)",
+    boxShadow: "rgba(100, 100, 111, 0.3) 0px 5px 5px 0px",
     height: 65,
     borderRadius: 12,
     display: "flex",
     padding: 10,
+    borderColor: "rgba(153, 153, 155, 0.3)",
+    borderWidth: 1,
   },
   itemText: {
     margin: "auto",
     fontSize: 18,
-    color: "rgb(20 0 102)",
     fontWeight: "600",
   },
   correctChoice: {
-    backgroundColor: "green",
+    backgroundColor: "rgb(78, 179, 74)",
   },
   incorrectChoice: {
-    backgroundColor: "red",
+    backgroundColor: "rgb(237, 84, 84)",
   },
   textResponse: {
-    color: "white",
     textAlign: "center",
     fontSize: 24,
   },

@@ -37,43 +37,44 @@ export default function Home() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.Viewtitle}>
+        <Text style={styles.title}>Historique des parties</Text>
+      </View>
+      {history.length && (
+        <FlatList
+          style={styles.list}
+          data={[...history].reverse()}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item, index }) => (
+            <TouchableOpacity onPress={() => handleGamePress(item.id)}>
+              <View style={styles.item}>
+                <Text style={styles.itemText}>{item.date}</Text>
+                <Text style={styles.itemText}>
+                  Score: {item.score} / {item.questions.length}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          )}
+        />
+      )}
+      {!history.length && (
+        <Text style={styles.text}>Aucun historique disponible...</Text>
+      )}
       <TouchableOpacity
         style={styles.startGameBtn}
         onPress={() => handlePress()}
       >
         <Text style={styles.startGameBtnText}>Lancer une partie</Text>
       </TouchableOpacity>
-      <Text style={styles.welcome}>Bienvenue {user?.email}!</Text>
-      <Text style={styles.title}>Historique des parties</Text>
-      <FlatList
-        data={[...history].reverse()}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item, index }) => (
-          <TouchableOpacity onPress={() => handleGamePress(item.id)}>
-            <View style={styles.item}>
-              <Text style={styles.itemText}>
-                Partie {history.length - index}
-              </Text>
-              <Text style={styles.itemText}>Date: {item.date}</Text>
-              <Text style={styles.itemText}>Score: {item.score}</Text>
-              <Text style={styles.itemText}>
-                Nombre de questions: {item.questions.length}
-              </Text>
-            </View>
-          </TouchableOpacity>
-        )}
-      />
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "rgb(20 0 102)",
-    paddingVertical: 40,
+    backgroundColor: "rgb(233, 236, 239)",
     flex: 1,
-    alignItems: "center",
-    gap: 20,
+    display: "flex",
   },
   welcome: {
     fontSize: 20,
@@ -81,35 +82,50 @@ const styles = StyleSheet.create({
     color: "whitesmoke",
   },
   startGameBtn: {
-    borderColor: "green",
-    borderWidth: 1,
+    backgroundColor: "rgb(78, 179, 74)",
     height: 80,
-    borderRadius: 10,
     paddingHorizontal: 30,
-    marginHorizontal: "auto",
     justifyContent: "center",
   },
   startGameBtnText: {
     fontSize: 20,
-    color: "green",
+    color: "whitesmoke",
     textAlign: "center",
   },
+  Viewtitle: {
+    backgroundColor: "rgb(233, 236, 239)",
+    padding: 10,
+  },
+
+  text: {
+    margin: "auto",
+  },
+
   title: {
-    fontSize: 24,
+    fontSize: 18,
+    textAlign: "center",
     fontWeight: "bold",
-    marginBottom: 20,
-    color: "whitesmoke",
+    marginBottom: 5,
+  },
+  list: {
+    display: "flex",
+    paddingHorizontal: 10,
   },
   item: {
-    backgroundColor: "white",
+    marginVertical: 5,
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
+    padding: 10,
+    gap: 10,
+    backgroundColor: "rgb(248, 249, 250)",
     borderRadius: 12,
-    padding: 15,
-    marginBottom: 10,
+    boxShadow: "rgba(100, 100, 111, 0.3) 0px 5px 5px 0px",
+    borderColor: "rgba(153, 153, 155, 0.3)",
+    borderWidth: 1,
   },
   itemText: {
     fontSize: 18,
-    color: "rgb(20 0 102)",
-    fontWeight: "600",
     marginBottom: 5,
   },
 });

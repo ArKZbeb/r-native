@@ -52,26 +52,27 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   levelText: {
-    color: "whitesmoke",
-    fontSize: 16,
-    fontWeight: "bold",
+    color: "black",
+    fontSize: 14,
   },
   expText: {
-    color: "whitesmoke",
-    fontSize: 14,
+    color: "black",
+    fontSize: 12,
   },
   progressBarBackground: {
     height: 10,
     backgroundColor: "rgba(255, 255, 255, 0.3)",
     borderRadius: 5,
     overflow: "hidden",
+    borderColor: "grey",
+    borderWidth: 1,
   },
   progressBarFill: {
     height: "100%",
     backgroundColor: "#4CAF50", // Vert vif pour la progression
   },
   progressText: {
-    color: "whitesmoke",
+    color: "black",
     textAlign: "center",
     marginTop: 5,
     fontSize: 12,

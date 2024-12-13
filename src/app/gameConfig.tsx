@@ -148,7 +148,7 @@ export default function GameConfig() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "rgb(20 0 102)",
+    backgroundColor: "rgb(233, 236, 239)",
     flex: 1,
     justifyContent: "space-evenly",
     alignItems: "center",
@@ -157,15 +157,13 @@ const styles = StyleSheet.create({
 
   title: {
     textAlign: "center",
-    color: "white",
-    fontSize: 28,
+    fontSize: 24,
   },
 
   text: {
     textAlign: "center",
-    color: "white",
-    fontSize: 22,
-    margin: 10,
+    fontSize: 18,
+    margin: 5,
   },
 
   list: {
@@ -177,8 +175,7 @@ const styles = StyleSheet.create({
   btnChoice: {
     backgroundColor: "whitesmoke",
     paddingVertical: 5,
-    margin: 5,
-    borderRadius: 10,
+    margin: 1,
   },
 
   btnChoiceText: {
@@ -196,12 +193,12 @@ const styles = StyleSheet.create({
 
   textNbQuestion: {
     margin: "auto",
-    color: "white",
+    color: "grey",
     fontSize: 26,
   },
 
   btnNbQuestion: {
-    borderColor: "white",
+    borderColor: "grey",
     borderWidth: 1,
     display: "flex",
     padding: 15,
@@ -213,21 +210,21 @@ const styles = StyleSheet.create({
   },
 
   startGameBtn: {
-    borderColor: "green",
+    backgroundColor: "rgb(78, 179, 74)",
     borderWidth: 1,
     borderRadius: 10,
     paddingVertical: 10,
-    paddingHorizontal: 30,
+    paddingHorizontal: 40,
     marginHorizontal: "auto",
   },
 
   startGameBtnText: {
     fontSize: 20,
-    color: "green",
+    color: "whitesmoke",
     margin: "auto",
   },
 
   activeBtn: {
-    backgroundColor: "green",
+    backgroundColor: "rgb(78, 179, 74)",
   },
 });
