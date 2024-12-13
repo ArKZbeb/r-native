@@ -30,15 +30,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     isLoading: true,
   });
 
-  const [request, response, promptAsync] = Google.useAuthRequest(
-    {
-      clientId:
-        "1094652425174-u5a1qb83iiemkuq4qvfmjsb06jhddag9.apps.googleusercontent.com",
-    },
-    {
-      native: "nativequiz://",
-    }
-  );
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    webClientId:
+      "1094652425174-u5a1qb83iiemkuq4qvfmjsb06jhddag9.apps.googleusercontent.com",
+    androidClientId:
+      "1094652425174-l4ffuimej211ch4dg088it8kvbmapvlu.apps.googleusercontent.com",
+  });
 
   useEffect(() => {
     loadUser();
