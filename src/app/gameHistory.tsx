@@ -53,6 +53,11 @@ export default function GameHistoryScreen() {
           <Text style={styles.itemText}>Date: {game.date}</Text>
           <Text style={styles.itemText}>Score: {game.score}</Text>
           <Text style={styles.itemText}>Questions:</Text>
+          {game.questions.map((question, index) => (
+            <Text key={index} style={styles.itemText}>
+              {index + 1}. {question.question}
+            </Text>
+          ))}
         </View>
         <CustomButton
           title="Retour à l'accueil"
