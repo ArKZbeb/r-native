@@ -2,7 +2,7 @@ export type Question = {
   id: number;
   category: Category;
   type: string;
-  difficulty: string;
+  difficulty: Difficulty;
   question: string;
   shuffledChoices: string[];
   correct_answer: string;

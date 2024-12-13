@@ -16,6 +16,8 @@ export async function scheduleNotification() {
     return;
   }
 
+  await Notifications.cancelAllScheduledNotificationsAsync();
+
   if (Platform.OS === "android") {
     await Notifications.setNotificationChannelAsync("default", {
       name: "default",
@@ -31,7 +33,7 @@ export async function scheduleNotification() {
       body: "Voici votre notification périodique.",
     },
     trigger: {
-      seconds: 60,
+      seconds: 3600,
       repeats: true,
       type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
     },

@@ -98,7 +98,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       const userJson = await AsyncStorage.getItem("session");
       if (userJson) {
-        setState({ user: JSON.parse(userJson), isLoading: false });
+        const storedUser = JSON.parse(userJson);
+        const user = new User(
+          storedUser.id,
+          storedUser.email,
+          storedUser.password,
+          storedUser.profilePhoto,
+          storedUser.expTotal
+        );
+        setState({ user, isLoading: false });
       } else {
         setState({ user: null, isLoading: false });
       }
@@ -121,7 +129,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         };
       }
 
-      const storedUser: User = JSON.parse(storedUserJson);
+      const storedUser = JSON.parse(storedUserJson);
       const hashedPassword = await hashPassword(password);
 
       if (storedUser.password !== hashedPassword) {
@@ -131,10 +139,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         };
       }
 
-      await AsyncStorage.setItem("session", JSON.stringify(storedUser));
-      setState({ user: storedUser, isLoading: false });
+      const user = new User(
+        storedUser.id,
+        storedUser.email,
+        storedUser.password,
+        storedUser.profilePhoto,
+        storedUser.expTotal
+      );
 
-      return { success: true, data: storedUser };
+      await AsyncStorage.setItem("session", JSON.stringify(user));
+      setState({ user, isLoading: false });
+
+      return { success: true, data: user };
     } catch (error) {
       console.error("Error signing in:", error);
       return {
@@ -252,6 +268,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       {children}
     </AuthContext.Provider>
   );
+};
+
+export const saveUser = async (user: User) => {
+  await AsyncStorage.setItem(user.email, JSON.stringify(user));
+  await AsyncStorage.setItem("session", JSON.stringify(user));
 };
 
 export const useAuth = () => {

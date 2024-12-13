@@ -14,6 +14,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { scheduleNotification } from "@/utils/notifications";
 import { saveGame } from "@/utils/game-manager";
 import { Game, GameType } from "@/types/game.types";
+import { getDifficultyStars } from "@/utils/questions";
 
 export default function List() {
   useEffect(() => {
@@ -36,19 +37,6 @@ export default function List() {
     };
     await saveGame(newGame);
     router.push("/questionDetail");
-  };
-
-  const getDifficultyStars = (difficulty: string): string => {
-    switch (difficulty) {
-      case "easy":
-        return "★☆☆";
-      case "medium":
-        return "★★☆";
-      case "hard":
-        return "★★★";
-      default:
-        return "☆☆☆";
-    }
   };
 
   const handleChangeText = (value: string) => {

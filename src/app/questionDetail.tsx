@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { clearGame, loadGame, saveGame } from "@/utils/game-manager";
 import { Game, GameType } from "@/types/game.types";
+import { getDifficultyStars } from "@/utils/questions";
 
 export default function QuestionDetail() {
   const [game, setGame] = useState<Game | null>(null);
@@ -131,6 +132,12 @@ export default function QuestionDetail() {
         </Text>
       )}
       <Text style={styles.question}>{currentQuestion.question}</Text>
+      <Text style={styles.category}>
+        {currentQuestion.category.toUpperCase()}
+      </Text>
+      <Text style={styles.difficulty}>
+        {getDifficultyStars(currentQuestion.difficulty)}
+      </Text>
       <View style={styles.container}>
         {currentQuestion.shuffledChoices.map((item, index) => (
           <TouchableOpacity
@@ -183,6 +190,16 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     fontSize: 24,
     color: "white",
+  },
+  difficulty: {
+    color: "white",
+    textAlign: "center",
+  },
+  category: {
+    textAlign: "center",
+    backgroundColor: "white",
+    padding: 10,
+    borderRadius: 10,
   },
   container: {
     display: "flex",
