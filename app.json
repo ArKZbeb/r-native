@@ -8,20 +8,31 @@
     "scheme": "nativequiz",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "platforms": ["web", "ios", "android"],
+    "platforms": [
+      "web",
+      "ios",
+      "android"
+    ],
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
         "NSCameraUsageDescription": "Cette application a besoin de votre permission pour utiliser la caméra.",
         "NSLocationWhenInUseUsageDescription": "Cette application a besoin de votre permission pour utiliser les notifications."
-      }
+      },
+      "bundleIdentifier": "com.samba953.nativequiz"
     },
     "android": {
-      "permissions": ["CAMERA", "NOTIFICATIONS"],
+      "permissions": [
+        "CAMERA",
+        "NOTIFICATIONS",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.samba953.nativequiz"
     },
     "web": {
       "bundler": "metro",
@@ -56,6 +67,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "e38f2b5b-19df-4b33-a54a-47eb82dd7af7"
+      }
     }
   }
 }
