@@ -12,7 +12,9 @@ import { getQuestionsList } from "@/utils/apiQuestions";
 import { Question, Category, Difficulty } from "@/models/question";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { scheduleNotification } from "@/utils/notifications";
-import { storeData } from "@/utils/storeQuestions";
+import { saveGame } from "@/utils/game-manager";
+import { Game, GameType } from "@/types/game.types";
+import { getDifficultyStars } from "@/utils/questions";
 
 export default function List() {
   useEffect(() => {
@@ -22,23 +24,18 @@ export default function List() {
   const [items, setItems] = useState<Question[]>([]); // Liste complète
   const [itemsFiltered, setItemsFiltered] = useState<Question[]>([]); // Liste filtrée
 
-  const handlePress = (item: Question, inGame: Boolean) => {
-    console.log(item);
-    storeData("game", item);
-    router.push(`/questionDetail?inGame=${false}`);
-  };
-
-  const getDifficultyStars = (difficulty: string): string => {
-    switch (difficulty) {
-      case "easy":
-        return "★☆☆";
-      case "medium":
-        return "★★☆";
-      case "hard":
-        return "★★★";
-      default:
-        return "☆☆☆";
-    }
+  const handlePress = async (item: Question) => {
+    const newGame: Game = {
+      type: GameType.SINGLE,
+      questions: [item],
+      currentQuestion: {
+        index: 0,
+        isAnswered: false,
+        selectedChoice: null,
+      },
+    };
+    await saveGame(newGame);
+    router.push("/questionDetail");
   };
 
   const handleChangeText = (value: string) => {
@@ -87,7 +84,7 @@ export default function List() {
         renderItem={({ item }) => (
           <TouchableOpacity
             style={styles.item}
-            onPress={() => handlePress(item, false)}
+            onPress={() => handlePress(item)}
           >
             <View style={styles.topItem}>
               <Text style={styles.index}>{`question ${item.id}`}</Text>
@@ -109,12 +106,10 @@ const styles = StyleSheet.create({
     backgroundColor: "rgb(20 0 102)",
     flex: 1,
   },
-
   inputView: {
     backgroundColor: "#0F0032",
     paddingVertical: 8,
   },
-
   input: {
     height: 40,
     borderColor: "gray",
@@ -126,12 +121,10 @@ const styles = StyleSheet.create({
     backgroundColor: "whitesmoke",
     borderRadius: 10,
   },
-
   list: {
     display: "flex",
     paddingHorizontal: 10,
   },
-
   item: {
     marginVertical: 5,
     display: "flex",
@@ -140,23 +133,19 @@ const styles = StyleSheet.create({
     backgroundColor: "whitesmoke",
     borderRadius: 12,
   },
-
   topItem: {
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
   },
-
   index: {
     fontWeight: "600",
     fontSize: 16,
     marginBottom: 5,
   },
-
   difficulty: {
     color: "#FFD700",
   },
-
   question: {
     fontSize: 16,
     marginTop: 10,

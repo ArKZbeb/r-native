@@ -1,130 +1,192 @@
-import { saveUser, useAuth } from "@/context/AuthContext";
-import { GameHistory } from "@/models/gameHistory";
-import { addGameToHistory } from "@/utils/gameHistory";
-import { difficultyValue } from "@/utils/dificultyValue";
-import { getData } from "@/utils/storeQuestions";
-import { router, useLocalSearchParams } from "expo-router";
+import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  BackHandler,
+  ActivityIndicator,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { clearGame, loadGame, saveGame } from "@/utils/game-manager";
+import { Game, GameType } from "@/types/game.types";
+import { getDifficultyStars } from "@/utils/questions";
+import { addGameToHistory } from "@/utils/gameHistory";
+import { GameHistory } from "@/models/gameHistory";
+import { useAuth } from "@/context/AuthContext";
+import { difficultyValue } from "@/utils/dificultyValue";
 
 export default function QuestionDetail() {
-  const { inGame } = useLocalSearchParams();
-  const [question, setQuestion] = useState<any | null>(null);
-  const [questions, setQuestions] = useState<any | null>(null);
-  const [isAnswered, setIsAnswered] = useState(false);
-  const [selectedChoice, setSelectedChoice] = useState<string | null>(null);
-  const [correctChoice, setCorrectChoice] = useState<string | null>(null);
-  const [choices, setChoices] = useState<string[]>([]);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [score, setScore] = useState(0);
+  const [game, setGame] = useState<Game | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetchQuestions();
+    if (game?.type === GameType.QUIZ) {
+      const handleBackPress = () => {
+        Alert.alert(
+          "Quitter la partie",
+          "Voulez-vous vraiment quitter la partie en cours ?",
+          [
+            {
+              text: "Annuler",
+              style: "cancel",
+            },
+            {
+              text: "Quitter",
+              style: "destructive",
+              onPress: async () => {
+                await clearGame();
+                router.back();
+              },
+            },
+          ]
+        );
+        return true;
+      };
+
+      const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        handleBackPress
+      );
+
+      return () => backHandler.remove();
+    }
+  }, [game]);
+
+  useEffect(() => {
+    const checkGame = async () => {
+      try {
+        const result = await loadGame();
+        if (result.success) {
+          setGame(result.data);
+        } else {
+          router.replace("/");
+        }
+      } catch (error) {
+        console.error("Error loading game:", error);
+        router.replace("/");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkGame();
   }, []);
 
-  const params =
-    inGame && typeof inGame === "string"
-      ? JSON.parse(decodeURIComponent(inGame))
-      : null;
-
-  const verifyResponse = async (item: string) => {
-    if (!isAnswered && question) {
-      setIsAnswered(true);
-      setSelectedChoice(item);
-      if (item === question.correct_answer) {
-        console.log("Bonne réponse");
-        user?.addExp(2 * difficultyValue(question.difficulty));
-        if (user) {
-          await saveUser(user);
-        }
-        setScore(score + 1);
-        setCorrectChoice(item);
-      } else {
-        setCorrectChoice(question.correct_answer);
-      }
-    }
-  };
   const { user } = useAuth();
 
-  if (user === null) {
+  if (!user) {
     return;
   }
+
   const saveGameHistory = async () => {
-    const game: GameHistory = {
-      id: new Date().toISOString(),
-      userId: user.id,
-      date: new Date().toLocaleString(),
-      score: score,
-      questions: questions.map((q: any) => q.question),
-    };
-    await addGameToHistory(game);
-  };
-
-  const fetchQuestions = async () => {
-    try {
-      const storedQuestions = await getData("game");
-
-      if (Array.isArray(storedQuestions)) {
-        setQuestions(storedQuestions);
-        const firstQuestion = storedQuestions[0];
-        setQuestion(firstQuestion);
-        setChoices(firstQuestion.shuffledChoices);
-      } else if (storedQuestions && storedQuestions.shuffledChoices) {
-        setQuestion(storedQuestions);
-        setChoices(storedQuestions.shuffledChoices);
-      } else {
-        console.error("Format de données invalide");
-      }
-    } catch (error) {
-      console.error("Erreur de récupération des questions", error);
+    if (game?.type === GameType.QUIZ) {
+      const gameHistory: GameHistory = {
+        id: new Date().toISOString(),
+        userId: user.id,
+        date: new Date().toLocaleString(),
+        ...game,
+      };
+      await addGameToHistory(gameHistory);
     }
   };
 
-  const nextQuestion = () => {
-    const nextIndex = currentQuestionIndex + 1;
-    if (questions && nextIndex < questions.length) {
-      setCurrentQuestionIndex(nextIndex);
-      const nextQuestion = questions[nextIndex];
-      setQuestion(nextQuestion);
-      setChoices(nextQuestion.shuffledChoices);
-      setIsAnswered(false); // Réinitialise l'état pour la prochaine question
-      setSelectedChoice(null);
-      setCorrectChoice(null);
+  const verifyResponse = async (choice: string) => {
+    if (game && !game.currentQuestion.isAnswered) {
+      if (game.type === GameType.QUIZ) {
+        game.questionSelections.push(choice);
+
+        const currentQuestion = game.questions[game.currentQuestion.index];
+        const isCorrect = currentQuestion.correct_answer === choice;
+
+        if (isCorrect) {
+          game.score += 1;
+          user?.addExp(2 * difficultyValue(currentQuestion.difficulty));
+        }
+      }
+
+      const updatedGame: Game = {
+        ...game,
+        currentQuestion: {
+          ...game.currentQuestion,
+          isAnswered: true,
+          selectedChoice: choice,
+        },
+      };
+
+      await saveGame(updatedGame);
+      setGame(updatedGame);
+    }
+  };
+
+  const nextQuestion = async () => {
+    if (!game) return;
+
+    const nextIndex = game.currentQuestion.index + 1;
+    if (nextIndex < game.questions.length) {
+      const updatedGame: Game = {
+        ...game,
+        currentQuestion: {
+          index: nextIndex,
+          isAnswered: false,
+          selectedChoice: null,
+        },
+      };
+      await saveGame(updatedGame);
+      setGame(updatedGame);
     } else {
       saveGameHistory();
       console.log("Aucune question suivante disponible.");
-      router.replace({
-        pathname: "/",
-      });
+      await clearGame();
+      router.replace("/");
     }
   };
 
-  if (!question) {
+  if (isLoading) {
     return (
-      <SafeAreaView style={styles.bg}>
-        <Text style={styles.textResponse}>Chargement...</Text>
+      <SafeAreaView style={[styles.bg, styles.centered]}>
+        <ActivityIndicator size="large" color="white" />
       </SafeAreaView>
     );
   }
 
+  if (!game || !game.questions || !game.currentQuestion) {
+    return null;
+  }
+
+  const currentQuestion = game.questions[game.currentQuestion.index];
+
   return (
     <SafeAreaView style={styles.bg}>
-      {params && (
-        <Text style={styles.text}>
-          Question {currentQuestionIndex + 1}/{questions.length}
-        </Text>
+      {game.type == GameType.QUIZ && (
+        <>
+          <Text style={styles.text}>
+            Question {game.currentQuestion.index + 1}/{game.questions.length}
+          </Text>
+          <Text style={styles.score}>
+            Score: {`${game.score} / ${game.questions.length}`}
+          </Text>
+        </>
       )}
-      <Text style={styles.question}>{question.question}</Text>
+      <Text style={styles.question}>{currentQuestion.question}</Text>
+      <Text style={styles.category}>
+        {currentQuestion.category.toUpperCase()}
+      </Text>
+      <Text style={styles.difficulty}>
+        {getDifficultyStars(currentQuestion.difficulty)}
+      </Text>
       <View style={styles.container}>
-        {choices.map((item, index) => (
+        {currentQuestion.shuffledChoices.map((item, index) => (
           <TouchableOpacity
             key={index}
             style={[
               styles.item,
-              item === correctChoice
+              item === currentQuestion.correct_answer &&
+              game.currentQuestion.isAnswered
                 ? styles.correctChoice
-                : selectedChoice === item
+                : game.currentQuestion.selectedChoice === item
                   ? styles.incorrectChoice
                   : null,
             ]}
@@ -135,10 +197,12 @@ export default function QuestionDetail() {
         ))}
       </View>
       <Text style={styles.textResponse}>
-        {isAnswered ? `la réponse était "${question.correct_answer}"` : ""}
+        {game.currentQuestion.isAnswered
+          ? `la réponse était "${currentQuestion.correct_answer}"`
+          : ""}
       </Text>
 
-      {params && isAnswered && (
+      {game.type == GameType.QUIZ && game.currentQuestion.isAnswered && (
         <TouchableOpacity
           onPress={() => nextQuestion()}
           style={styles.startGameBtn}
@@ -149,33 +213,48 @@ export default function QuestionDetail() {
     </SafeAreaView>
   );
 }
+
 const styles = StyleSheet.create({
   bg: {
     flex: 1,
     backgroundColor: "rgb(20 0 102)",
     justifyContent: "space-around",
   },
-
+  centered: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
   question: {
     textAlign: "center",
     marginHorizontal: 10,
     fontSize: 24,
     color: "white",
   },
-
+  score: {
+    color: "white",
+    textAlign: "center",
+  },
+  difficulty: {
+    color: "white",
+    textAlign: "center",
+  },
+  category: {
+    textAlign: "center",
+    backgroundColor: "white",
+    padding: 10,
+    borderRadius: 10,
+  },
   container: {
     display: "flex",
     flexDirection: "column",
     gap: 20,
     paddingHorizontal: 20,
   },
-
   text: {
     textAlign: "center",
     color: "white",
     fontSize: 24,
   },
-
   item: {
     backgroundColor: "white",
     height: 65,
@@ -183,7 +262,6 @@ const styles = StyleSheet.create({
     display: "flex",
     padding: 10,
   },
-
   itemText: {
     margin: "auto",
     fontSize: 18,
@@ -191,10 +269,10 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   correctChoice: {
-    backgroundColor: "green", // La bonne réponse en vert
+    backgroundColor: "green",
   },
   incorrectChoice: {
-    backgroundColor: "red", // La réponse incorrecte en rouge
+    backgroundColor: "red",
   },
   textResponse: {
     color: "white",
@@ -209,7 +287,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     marginHorizontal: "auto",
   },
-
   startGameBtnText: {
     fontSize: 20,
     color: "green",

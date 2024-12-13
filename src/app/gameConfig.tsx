@@ -8,14 +8,14 @@ import {
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { getQuestionsList } from "@/utils/apiQuestions";
 import { Category, Difficulty } from "@/models/question";
-import { storeData } from "@/utils/storeQuestions";
 import { router } from "expo-router";
 import { useState } from "react";
+import { saveGame } from "@/utils/game-manager";
+import { Game, GameType } from "@/types/game.types";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function GameConfig() {
   const [nbOfQuestion, setnbOfQuestion] = useState(3);
-  const [isLoading, setIsLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category>(
     Category.any
   );
@@ -51,25 +51,27 @@ export default function GameConfig() {
     setActiveDifficulty(item);
   };
 
-  const fetchQuestions = async () => {
-    return await getQuestionsList(
+  const startGame = async () => {
+    const questions = await getQuestionsList(
       `${nbOfQuestion}`,
       selectedCategory,
       selectedDifficulty
     );
-  };
 
-  const startGame = async () => {
-    if (isLoading) return;
-    try {
-      setIsLoading(true);
-      const questions = await fetchQuestions();
-      storeData("game", questions);
-      router.push(`/questionDetail?inGame=${true}`);
-    } catch (error) {
-      console.error("Erreur lors du démarrage du jeu", error);
-      setIsLoading(false);
-    }
+    const newGame: Game = {
+      type: GameType.QUIZ,
+      questions: questions,
+      score: 0,
+      questionSelections: [],
+      currentQuestion: {
+        index: 0,
+        isAnswered: false,
+        selectedChoice: null,
+      },
+    };
+
+    await saveGame(newGame);
+    router.push("/questionDetail");
   };
 
   return (

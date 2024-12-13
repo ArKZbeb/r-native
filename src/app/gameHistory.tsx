@@ -55,7 +55,7 @@ export default function GameHistoryScreen() {
           <Text style={styles.itemText}>Questions:</Text>
           {game.questions.map((question, index) => (
             <Text key={index} style={styles.itemText}>
-              {index + 1}. {question}
+              {index + 1}. {question.question}
             </Text>
           ))}
         </View>

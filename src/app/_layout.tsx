@@ -1,8 +1,8 @@
 import { Stack } from "expo-router";
-import { AuthProvider } from "../context/AuthContext";
+import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { useEffect } from "react";
 import { useSegments, useRouter } from "expo-router";
-import { useAuth } from "../context/AuthContext";
+import { clearGame, loadGame } from "@/utils/game-manager";
 
 export const unstable_settings = {
   initialRouteName: "(auth)",
@@ -13,6 +13,7 @@ function RootLayoutNav() {
   const segments = useSegments();
   const router = useRouter();
 
+  // Auth navigation
   useEffect(() => {
     if (isLoading) return;
 
@@ -27,8 +28,27 @@ function RootLayoutNav() {
     }
   }, [user, segments, isLoading]);
 
+  // Game state navigation
+  useEffect(() => {
+    const onPageLoad = async () => {
+      if (isLoading) return;
+
+      if (!user) {
+        await clearGame();
+        return;
+      }
+
+      const game = await loadGame();
+
+      if (game) {
+        router.replace("/questionDetail");
+      }
+    };
+
+    onPageLoad();
+  }, [user, isLoading]);
+
   if (isLoading) {
-    // You might want to add a loading screen here
     return null;
   }
 
