@@ -40,7 +40,7 @@ export default function Home() {
       <View style={styles.Viewtitle}>
         <Text style={styles.title}>Historique des parties</Text>
       </View>
-      {history.length && (
+      {history.length > 0 && (
         <FlatList
           style={styles.list}
           data={[...history].reverse()}
