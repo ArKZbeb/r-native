@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
   FlatList,
 } from "react-native";
 import { useAuth } from "@/context/AuthContext";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import { getGameHistory } from "@/utils/gameHistory";
 import { GameHistory } from "@/models/gameHistory";
 
@@ -16,16 +16,18 @@ export default function Home() {
   const { user } = useAuth();
   const [history, setHistory] = useState<GameHistory[]>([]);
 
-  useEffect(() => {
-    const fetchHistory = async () => {
-      if (user) {
-        const gameHistory = await getGameHistory(user.id);
-        setHistory(gameHistory);
-      }
-    };
+  useFocusEffect(
+    useCallback(() => {
+      const fetchHistory = async () => {
+        if (user) {
+          const gameHistory = await getGameHistory(user.id);
+          setHistory(gameHistory);
+        }
+      };
 
-    fetchHistory();
-  }, [user]);
+      fetchHistory();
+    }, [user])
+  );
 
   const handlePress = () => {
     router.push("/gameConfig");

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -10,7 +10,7 @@ import {
 import { getGameHistory, getGameById } from "@/utils/gameHistory";
 import { GameHistory } from "@/models/gameHistory";
 import { useAuth } from "@/context/AuthContext";
-import { router, useLocalSearchParams } from "expo-router";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { CustomButton } from "@/components/CustomButton"; // Import CustomButton
 
 export default function GameHistoryScreen() {
@@ -19,16 +19,17 @@ export default function GameHistoryScreen() {
   const { id } = useLocalSearchParams();
   const [game, setGame] = useState<GameHistory | null>(null);
 
-  useEffect(() => {
-    const fetchHistory = async () => {
-      if (user) {
-        const gameHistory = await getGameHistory(user.id);
-        setHistory(gameHistory);
-      }
-    };
-
-    fetchHistory();
-  }, [user]);
+  useFocusEffect(
+    useCallback(() => {
+      const fetchHistory = async () => {
+        if (user) {
+          const gameHistory = await getGameHistory(user.id);
+          setHistory(gameHistory);
+        }
+      };
+      fetchHistory();
+    }, [user])
+  );
 
   useEffect(() => {
     if (typeof id === "string" && user) {

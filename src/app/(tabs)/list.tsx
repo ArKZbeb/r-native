@@ -22,7 +22,7 @@ export default function List() {
   const [items, setItems] = useState<Question[]>([]); // Liste complète
   const [itemsFiltered, setItemsFiltered] = useState<Question[]>([]); // Liste filtrée
 
-  const handlePress = (item: Question, inGame: Boolean) => {
+  const handlePress = (item: Question, inGame: boolean) => {
     console.log(item);
     storeData("game", item);
     router.push(`/questionDetail?inGame=${false}`);
