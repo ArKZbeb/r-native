@@ -2,9 +2,10 @@ import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { getQuestionsList } from "@/utils/apiQuestions";
 import { Category, Difficulty } from "@/models/question";
-import { getData, storeData } from "@/utils/storeQuestions";
 import { router } from "expo-router";
 import { useState } from "react";
+import { saveGame } from "@/utils/game-manager";
+import { Game, GameType } from "@/types/game.types";
 
 export default function GameConfig() {
   const [nbOfQuestion, setnbOfQuestion] = useState(3);
@@ -20,18 +21,26 @@ export default function GameConfig() {
     }
   };
 
-  const fetchQuestions = async () => {
-    return await getQuestionsList(
+  const startGame = async () => {
+    const questions = await getQuestionsList(
       `${nbOfQuestion}`,
       Category.any,
       Difficulty.any
     );
-  };
 
-  const startGame = async () => {
-    const questions = await fetchQuestions();
-    storeData("game", questions);
-    router.push(`/questionDetail?inGame=${true}`);
+    const newGame: Game = {
+      type: GameType.QUIZ,
+      questions: questions,
+      questionSelections: [],
+      currentQuestion: {
+        index: 0,
+        isAnswered: false,
+        selectedChoice: null,
+      },
+    };
+
+    await saveGame(newGame);
+    router.push("/questionDetail");
   };
 
   return (

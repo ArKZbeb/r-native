@@ -1,11 +1,4 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  SafeAreaView,
-} from "react-native";
+import { Text, StyleSheet, TouchableOpacity, SafeAreaView } from "react-native";
 import { useAuth } from "@/context/AuthContext";
 import { router } from "expo-router";
 
